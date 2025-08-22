@@ -8,7 +8,8 @@
   --shadow-btn: 0 6px 18px rgba(249, 115, 22, 0.35);
   --maxw-mobile: 420px;
   --maxw-desktop: 560px;
-  --black: #fff;
+  --black: #000000;
+  --white: #fff;
 
 }
 
@@ -16,7 +17,7 @@
 html,body { height: 100%; margin: 0; }
 
 body {
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu,
+  font-family: "Poppins", system-ui, -apple-system, Segoe UI, Roboto, Ubuntu,
     "Helvetica Neue", Arial, sans-serif;
   color: var(--text);
   background: linear-gradient(135deg, var(--bg-light), var(--bg-dark));
@@ -41,6 +42,10 @@ body {
 
 .brand { margin-bottom: 20px; }
 
+.brand .logo-text {
+  font-weight: 800;
+}
+
 .logo {
     width: 180px;
   height: auto;
@@ -63,9 +68,9 @@ body {
 }
 
 .subtitle {
-  font-size: 0.95rem;
+  font-size: 1.3rem;
   font-weight: 600;
-  color: var(--black);
+  color: var(--white);
   margin: 0;
 }
 
@@ -83,16 +88,19 @@ body {
   width: 100%;
   background: var(--accent);
   color: #fff;
-  font-weight: 700;
-  font-size: 1rem;
+  font-weight: 600;
+  font-size: 1.1rem;
+  font-family: 'Poppins', sans-serif;
   cursor: pointer;
   box-shadow: var(--shadow-btn);
   transition: transform 0.1s ease, background 0.2s ease;
 }
+
 .btn:hover {
   background: #d9480f; /* más oscuro */
   transform: translateY(-1px);
 }
+
 .btn:active {
   transform: translateY(0);
   background: #b73e0d; /* aún más oscuro */
@@ -116,10 +124,9 @@ body {
     padding: 32px;
   }
   .logo { width: 240px; }
-  .subtitle { font-size: 1.1rem; }
+  .subtitle { font-size: 1.5rem; }
   .btn { font-size: 1.1rem; padding: 18px 22px; }
 }
-
 
 /* Animación al cargar */
 @keyframes logoFadeIn {
