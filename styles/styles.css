@@ -110,34 +110,3 @@ body {
   outline-offset: 2px;
 }
 
-/* Tablet */
-@media (min-width: 640px) {
-  .logo { width: 200px; }
-  .subtitle { font-size: 1rem; }
-  .btn { font-size: 1.05rem; padding: 16px 20px; }
-}
-
-/* Escritorio */
-@media (min-width: 1024px) {
-  .card {
-    max-width: var(--maxw-desktop);
-    padding: 32px;
-  }
-  .logo { width: 240px; }
-  .subtitle { font-size: 1.5rem; }
-  .btn { font-size: 1.1rem; padding: 18px 22px; }
-}
-
-/* Animación al cargar */
-@keyframes logoFadeIn {
-  0% {
-    opacity: 0;
-    transform: scale(0.9);
-    filter: drop-shadow(0 0 0 rgba(59, 130, 246, 0));
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1);
-    filter: drop-shadow(0 0 12px rgba(0, 0, 0, 0.6));
-  }
-}
