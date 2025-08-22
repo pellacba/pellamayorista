@@ -1,0 +1,17 @@
+/* Tablet */
+@media (min-width: 640px) {
+  .logo { width: 200px; }
+  .subtitle { font-size: 1rem; }
+  .btn { font-size: 1.05rem; padding: 16px 20px; }
+}
+
+/* Escritorio */
+@media (min-width: 1024px) {
+  .card {
+    max-width: var(--maxw-desktop);
+    padding: 32px;
+  }
+  .logo { width: 240px; }
+  .subtitle { font-size: 1.5rem; }
+  .btn { font-size: 1.1rem; padding: 18px 22px; }
+}
