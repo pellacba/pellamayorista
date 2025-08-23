@@ -39,10 +39,7 @@ const Cart = (() => {
 
   const distinct = () => state.items.length;
 
-  const money = (n) => {
-  const v = Number(n || 0);
-  return v.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-};
+  const money = (n) => Number(n||0).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 const renderBadge = () => {
   const el = document.getElementById("cart-count");
@@ -147,28 +144,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.getElementById("cart-fab")?.addEventListener("click", Cart.openDrawer);
   document.getElementById("cart-close")?.addEventListener("click", Cart.closeDrawer);
-  // (sin handler en cart-backdrop)
-  document.getElementById("cart-clear")?.addEventListener("click", Cart.clear);
-  document.getElementById("cart-checkout")?.addEventListener("click", () => {
-    alert("Aquí iría tu flujo de checkout / pedido.");
-  });
+
+  // Abrir modal de vendedores en lugar de mandar directo
+  document.getElementById("cart-whatsapp")?.addEventListener("click", openSellerModal);
+
+  // Modal bindings
+  document.getElementById("seller-close")?.addEventListener("click", closeSellerModal);
+  document.getElementById("seller-cancel")?.addEventListener("click", closeSellerModal);
+  document.getElementById("seller-confirm")?.addEventListener("click", sendOrderToSelectedSeller);
+
+  document.getElementById("seller-list")?.addEventListener("click", (e) => {
+  const btn = e.target.closest(".seller-pick");
+  if (!btn) return;
+  // Abrir WhatsApp directo SIN precios
+  sendOrderToSellerId(btn.dataset.id);
+});
+  // Si querés evitar cerrar con backdrop:
+  // (No agregamos listener al backdrop para no cerrar al hacer click afuera)
 });
 
-  document.getElementById("cart-whatsapp")?.addEventListener("click", () => {
-  // Armamos mensaje de pedido
-  const items = JSON.parse(localStorage.getItem(CART_KEY) || '{"items":[]}').items || [];
-  if (!items.length) { alert("El carrito está vacío."); return; }
 
-  const lines = items.map(it => `• ${it.name}  x${it.qty}${it.price ? `  ($${(it.price*it.qty).toFixed(2)})` : ""}`);
-  const total = items.reduce((a,i)=>a+(Number(i.price||0)*i.qty),0);
-  const msg = `Hola! Quiero hacer este pedido:\n\n${lines.join("\n")}\n\nTotal: $${total.toFixed(2)}`;
-
-  // Teléfono destino (reemplazá por el tuyo, con código país sin +)
-  const phone = "5493512260685";
-  const url = `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
-
-  window.open(url, "_blank");
-});
 
 function closeDrawer() {
   const drawer = document.getElementById("cart-drawer");
@@ -183,3 +178,68 @@ function closeDrawer() {
 window.Carrito = {
   add: ({name, sku, price}) => Cart.add({name, sku, price: Number(price||0), qty: 1})
 };
+
+// Contactos disponibles (editá nombres y teléfonos)
+const SELLERS = [
+  { id: "v1", name: "Nicolas Rame",  phone: "5493512260685" }
+];
+
+function openSellerModal(){
+  const list = document.getElementById("seller-list");
+  if (list){
+    list.innerHTML = SELLERS.map(s => `
+      <li class="seller-item">
+        <button type="button" class="seller-pick" data-id="${s.id}">
+          <div class="seller-name">${s.name}</div>
+        </button>
+      </li>
+    `).join("");
+  }
+
+  document.getElementById("seller-backdrop")?.classList.add("open");
+  document.getElementById("seller-modal")?.classList.add("open");
+  document.getElementById("seller-modal")?.setAttribute("aria-hidden","false");
+}
+
+function closeSellerModal(){
+  document.getElementById("seller-backdrop")?.classList.remove("open");
+  document.getElementById("seller-modal")?.classList.remove("open");
+  document.getElementById("seller-modal")?.setAttribute("aria-hidden","true");
+}
+
+// Construir mensaje y abrir WhatsApp al vendedor elegido
+function sendOrderToSelectedSeller(){
+    const msg = buildOrderMessageNoPrices();
+  if (!msg){ alert("El carrito está vacío."); return; }
+
+  const seller = SELLERS.find(s => s.id === id);
+  if (!seller){ alert("Vendedor inválido."); return; }
+
+  const url = `https://wa.me/${seller.phone}?text=${encodeURIComponent(msg)}`;
+  // window.open(url, "_blank");  // <- puede ser bloqueado
+  location.href = url;            // <- más fiable desde un click directo
+  closeSellerModal();
+}
+
+function buildOrderMessageNoPrices(){
+  const items = JSON.parse(localStorage.getItem(CART_KEY) || '{"items":[]}').items || [];
+  if (!items.length) return null;
+
+  const lines = items.map(it => `• ${it.name} , Cantidad: ${it.qty}`); // ← sin precios
+  const totalQty  = items.reduce((a,i)=>a+i.qty,0);
+  const totalSkus = items.length;
+
+  return `¡Hola! Quiero hacer este pedido:\n\n${lines.join("\n")}\n\n` 
+}
+
+function sendOrderToSellerId(id){
+  const msg = buildOrderMessageNoPrices();
+  if (!msg){ alert("El carrito está vacío."); return; }
+
+  const seller = SELLERS.find(s => s.id === id);
+  if (!seller){ alert("Vendedor inválido."); return; }
+
+  const url = `https://wa.me/${seller.phone}?text=${encodeURIComponent(msg)}`;
+  window.open(url, "_blank");
+  closeSellerModal();
+}
