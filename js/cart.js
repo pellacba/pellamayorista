@@ -1,5 +1,5 @@
 // js/cart.js
-const CART_KEY = "pella_cart_v1";
+const CART_KEY = "cart_v1";
 
 const Cart = (() => {
   let state = { items: [] }; // { sku, name, price (num), qty }
@@ -121,6 +121,6 @@ function closeDrawer() {
 }
 
 // API global mínima
-window.PellaCart = {
+window.Carrito = {
   add: ({name, sku, price}) => Cart.add({name, sku, price: Number(price||0), qty: 1})
 };
