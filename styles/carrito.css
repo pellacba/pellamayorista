@@ -6,6 +6,7 @@
 
 /* Flipbook centrado */
 .flipbook {
+  margin-top: 80px;
   display: grid;
   place-items: center;       /* centra el spread */
   width: 100%;
