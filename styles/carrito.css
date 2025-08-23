@@ -4,6 +4,7 @@
   --page-h-desktop: clamp(78svh, 86svh, 92svh);
 }
 
+
 /* Flipbook centrado */
 .flipbook {
   margin-top: 80px;

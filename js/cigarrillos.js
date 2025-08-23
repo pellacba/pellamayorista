@@ -52,7 +52,7 @@ function render(){
       hs.style.left = it.x; hs.style.top = it.y; hs.style.width = it.w; hs.style.height = it.h;
       const btn = document.createElement("button");
       btn.className = "add-btn";
-      btn.addEventListener("click", (e)=>{ e.stopPropagation(); window.PellaCart.add({name: it.name, sku: it.sku, price: it.price}); });
+      btn.addEventListener("click", (e)=>{ e.stopPropagation(); window.Carrito.add({name: it.name, sku: it.sku, price: it.price}); });
       hs.appendChild(btn);
       page.appendChild(hs);
     });
@@ -86,54 +86,65 @@ function animateOut(direction){
 }
 
 function enableSwipeDrag(container){
-  let down = false, startX = 0, dx = 0;
-  const TH = 60; // umbral para cambiar de página (px)
+  if (!container) return;
 
+  let down = false, startX = 0, dx = 0;
+  const TH = 60; // umbral px
   const spreadEl = () => container.querySelector(".spread");
 
+  // elementos donde NO debe iniciarse el drag
+  const INTERACTIVE_SELECTOR = `
+    .add-btn,
+    button,
+    a,
+    input,
+    textarea,
+    select,
+    [role="button"],
+    .cart-drawer,
+    .cart-fab
+  `;
+
   container.addEventListener("pointerdown", (e) => {
+    // si arrancó sobre algo interactivo, no drag
+    if (e.target.closest(INTERACTIVE_SELECTOR)) return;
+
+    // solo botón izquierdo del mouse (o touch)
+    if (e.pointerType === "mouse" && e.button !== 0) return;
+
     down = true;
     startX = e.clientX;
     dx = 0;
     container.classList.add("dragging");
-    container.setPointerCapture(e.pointerId);
+    // capturamos el puntero SOLO si no es elemento interactivo
+    container.setPointerCapture?.(e.pointerId);
   });
 
   container.addEventListener("pointermove", (e) => {
     if (!down) return;
     dx = e.clientX - startX;
-    // movimiento visual del spread mientras arrastro
     const s = spreadEl();
     if (s) s.style.transform = `translateX(${dx}px)`;
   });
 
   function settle(direction){
     const s = spreadEl();
-    if (!s) return;
-    // vuelvo a cero la traducción para permitir la anim de giro
-    s.style.transform = "translateX(0)";
+    if (s) s.style.transform = "translateX(0)";
     if (direction === "next") next();
     else if (direction === "prev") prev();
   }
 
-  container.addEventListener("pointerup", () => {
+  function endDrag(){
     if (!down) return;
     down = false;
     container.classList.remove("dragging");
     if (dx < -TH) settle("next");
     else if (dx > TH) settle("prev");
-    else { // si no superó el umbral, vuelvo suave al centro
-      const s = spreadEl();
-      if (s) s.style.transform = "translateX(0)";
-    }
-  });
+    else { const s = spreadEl(); if (s) s.style.transform = "translateX(0)"; }
+  }
 
-  container.addEventListener("pointercancel", () => {
-    down = false;
-    container.classList.remove("dragging");
-    const s = spreadEl();
-    if (s) s.style.transform = "translateX(0)";
-  });
+  container.addEventListener("pointerup", endDrag);
+  container.addEventListener("pointercancel", endDrag);
 }
 
 function bindNav(){
