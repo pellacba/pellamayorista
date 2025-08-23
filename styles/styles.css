@@ -11,6 +11,9 @@
   --black: #000000;
   --white: #fff;
 
+  --page-h-mobile: 78svh;   /* casi toda la pantalla en mobile */
+  --page-h-desktop: 86svh;  /* más alta en desktop */
+
 }
 
 *,*::before,*::after { box-sizing: border-box; }

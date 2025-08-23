@@ -5,10 +5,41 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="img/pellalogo.png" type="image/x-icon">
     <link rel="stylesheet" href="styles/styles.css" />
+    <link rel="stylesheet" href="styles/carrito.css">
     <title>Cigarrillos</title>
 </head>
 <body>
-    
-    <script src="js/app.js" defer></script>
+
+<section id="flipbook" class="flipbook" aria-label="Catálogo Cigarrillos">
+
+</section>
+
+  <!-- FAB carrito -->
+  <button id="cart-fab" class="cart-fab" aria-label="Ver carrito">
+    <img src="img/carrito-de-compras.png" alt="" class="cart-icon">
+    <span id="cart-count" class="cart-count">0</span>
+  </button>
+
+  <!-- Drawer carrito -->
+  <aside id="cart-drawer" class="cart-drawer" aria-hidden="true">
+    <header class="cart-header">
+      <h2>Carrito</h2>
+      <button id="cart-close" class="cart-close" aria-label="Cerrar">✕</button>
+    </header>
+    <div id="cart-items" class="cart-items"></div>
+    <footer class="cart-footer">
+      <div class="totals"><span>Total</span> <strong id="cart-total">$0</strong></div>
+      <div class="cart-actions">
+        <button id="cart-clear" class="secondary">Vaciar</button>
+        <button id="cart-checkout">Continuar</button>
+      </div>
+    </footer>
+  </aside>
+  <div id="cart-backdrop" class="cart-backdrop" aria-hidden="true"></div>
+
+  <!-- JS -->
+  <script src="js/cart.js" defer></script>
+  <script src="js/cigarrillos-imagenes.js" defer></script>
+  <script src="js/cigarrillos.js" defer></script>
 </body>
 </html>
