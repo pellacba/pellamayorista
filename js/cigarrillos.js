@@ -7,22 +7,46 @@ const nextZone = document.getElementById("nextZone");
 
 const isDesktop = () => window.matchMedia("(min-width:1024px)").matches;
 
+function ensurePct(v) {
+  // Acepta número o string; devuelve string %
+  return typeof v === "number" ? `${v}%` : v ?? "0%";
+}
+
+function pickRect(item) {
+  // Si el item tiene pos.{mobile,desktop}, elegimos según el viewport
+  // Si no, caemos a los campos planos x,y,w,h (retrocompatible)
+  const variant = item.pos
+    ? isDesktop()
+      ? item.pos.desktop || item.pos.mobile
+      : item.pos.mobile || item.pos.desktop
+    : item;
+
+  return {
+    x: ensurePct(variant.x ?? item.x),
+    y: ensurePct(variant.y ?? item.y),
+    w: ensurePct(variant.w ?? item.w),
+    h: ensurePct(variant.h ?? item.h),
+  };
+}
+
 // Estado
 let pages = window.CIG_IMG_PAGES || [];
-let hotspotsMap = {};       // { idx:number -> items:[] }
-let index = 0;              // índice base 0
+let hotspotsMap = {}; // { idx:number -> items:[] }
+let index = 0; // índice base 0
 
 // Carga hotspots
-async function loadHotspots(){
-  try{
+async function loadHotspots() {
+  try {
     const res = await fetch("data/cigarrillos.hotspots.json");
     const list = await res.json();
-    list.forEach(p => hotspotsMap[p.idx] = p.items || []);
-  }catch(e){ hotspotsMap = {}; }
+    list.forEach((p) => (hotspotsMap[p.idx] = p.items || []));
+  } catch (e) {
+    hotspotsMap = {};
+  }
 }
 
 // Renderiza spread actual (1 pag en mobile, 2 en desktop)
-function render(){
+function render() {
   flipbook.querySelector(".spread")?.remove();
 
   const spread = document.createElement("div");
@@ -30,35 +54,45 @@ function render(){
   flipbook.appendChild(spread);
 
   const perView = isDesktop() ? 2 : 1;
-  for(let i=0;i<perView;i++){
+  for (let i = 0; i < perView; i++) {
     const idx = index + i;
-    if(idx >= pages.length) break;
+    if (idx >= pages.length) break;
     const page = document.createElement("div");
     page.className = "page enter-active";
     // animación de entrada acorde a dirección
-    page.classList.add(i===0 && perView===1 ? "enter-from-right" : "enter-from-right");
-    requestAnimationFrame(()=> page.classList.add("enter-active"));
+    page.classList.add(
+      i === 0 && perView === 1 ? "enter-from-right" : "enter-from-right"
+    );
+    requestAnimationFrame(() => page.classList.add("enter-active"));
 
     const img = document.createElement("img");
     img.src = pages[idx];
-    img.alt = `Página ${idx+1}`;
+    img.alt = `Página ${idx + 1}`;
     page.appendChild(img);
 
     // hotspots
-    const items = hotspotsMap[idx+1] || [];
-    items.forEach(it => {
+    const items = hotspotsMap[idx + 1] || [];
+    items.forEach((it) => {
       const hs = document.createElement("div");
       hs.className = "hotspot";
-      hs.style.left = it.x; hs.style.top = it.y; hs.style.width = it.w; hs.style.height = it.h;
+
+      // ⬇️ NUEVO: tomar rect responsive
+      const r = pickRect(it);
+      hs.style.left = r.x;
+      hs.style.top = r.y;
+      hs.style.width = r.w;
+      hs.style.height = r.h;
+
       const btn = document.createElement("button");
       btn.className = "add-btn";
-      btn.addEventListener("click", (e)=>{ e.stopPropagation(); window.Carrito.add(
-        {
-        name: it.name, sku: it.sku, price: it.price}); 
-        
-        btn.classList.remove('clicked');
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        window.Carrito.add({ name: it.name, sku: it.sku, price: it.price });
+
+        // feedback animación (más notoria si ya la definiste en CSS)
+        btn.classList.remove("clicked", "ripple");
         void btn.offsetWidth; // reflow para reiniciar
-        btn.classList.add('clicked'); 
+        btn.classList.add("clicked", "ripple");
       });
       hs.appendChild(btn);
       page.appendChild(hs);
@@ -69,33 +103,35 @@ function render(){
 }
 
 // Navegación con animación
-function next(){
+function next() {
   const step = isDesktop() ? 2 : 1;
-  if(index + step >= pages.length) return;
+  if (index + step >= pages.length) return;
   animateOut("left");
   index += step;
   setTimeout(render, 480);
 }
-function prev(){
+function prev() {
   const step = isDesktop() ? 2 : 1;
-  if(index - step < 0) return;
+  if (index - step < 0) return;
   animateOut("right");
   index -= step;
   setTimeout(render, 480);
 }
 
-function animateOut(direction){
+function animateOut(direction) {
   const currentPages = flipbook.querySelectorAll(".page");
-  currentPages.forEach(p=>{
-    p.classList.remove("enter-from-right","enter-from-left","enter-active");
-    p.classList.add(direction==="left" ? "exit-to-left" : "exit-to-right");
+  currentPages.forEach((p) => {
+    p.classList.remove("enter-from-right", "enter-from-left", "enter-active");
+    p.classList.add(direction === "left" ? "exit-to-left" : "exit-to-right");
   });
 }
 
-function enableSwipeDrag(container){
+function enableSwipeDrag(container) {
   if (!container) return;
 
-  let down = false, startX = 0, dx = 0;
+  let down = false,
+    startX = 0,
+    dx = 0;
   const TH = 60; // umbral px
   const spreadEl = () => container.querySelector(".spread");
 
@@ -134,27 +170,30 @@ function enableSwipeDrag(container){
     if (s) s.style.transform = `translateX(${dx}px)`;
   });
 
-  function settle(direction){
+  function settle(direction) {
     const s = spreadEl();
     if (s) s.style.transform = "translateX(0)";
     if (direction === "next") next();
     else if (direction === "prev") prev();
   }
 
-  function endDrag(){
+  function endDrag() {
     if (!down) return;
     down = false;
     container.classList.remove("dragging");
     if (dx < -TH) settle("next");
     else if (dx > TH) settle("prev");
-    else { const s = spreadEl(); if (s) s.style.transform = "translateX(0)"; }
+    else {
+      const s = spreadEl();
+      if (s) s.style.transform = "translateX(0)";
+    }
   }
 
   container.addEventListener("pointerup", endDrag);
   container.addEventListener("pointercancel", endDrag);
 }
 
-function bindNav(){
+function bindNav() {
   nextBtn.addEventListener("click", next);
   prevBtn.addEventListener("click", prev);
   nextZone.addEventListener("click", next);
@@ -162,17 +201,17 @@ function bindNav(){
   enableSwipe(flipbook);
 }
 
-window.addEventListener("resize", ()=> {
+window.addEventListener("resize", () => {
   // cuando cambia entre 1 y 2 páginas, normalizo el índice par
-  if(isDesktop() && index % 2 === 1) index -= 1;
+  if (isDesktop() && index % 2 === 1) index -= 1;
   render();
 });
 
 // Init
-(async function(){
+(async function () {
   await loadHotspots();
-if (isDesktop() && index % 2 === 1) index -= 1;
+  if (isDesktop() && index % 2 === 1) index -= 1;
 
-enableSwipeDrag(flipbook);   // ← aquí
-render();
+  enableSwipeDrag(flipbook); // ← aquí
+  render();
 })();
