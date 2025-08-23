@@ -52,7 +52,14 @@ function render(){
       hs.style.left = it.x; hs.style.top = it.y; hs.style.width = it.w; hs.style.height = it.h;
       const btn = document.createElement("button");
       btn.className = "add-btn";
-      btn.addEventListener("click", (e)=>{ e.stopPropagation(); window.Carrito.add({name: it.name, sku: it.sku, price: it.price}); });
+      btn.addEventListener("click", (e)=>{ e.stopPropagation(); window.Carrito.add(
+        {
+        name: it.name, sku: it.sku, price: it.price}); 
+        
+        btn.classList.remove('pop');
+        void btn.offsetWidth; // reflow para reiniciar
+        btn.classList.add('pop'); 
+      });
       hs.appendChild(btn);
       page.appendChild(hs);
     });
