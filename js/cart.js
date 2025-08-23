@@ -37,11 +37,16 @@ const Cart = (() => {
 
   const count = () => state.items.reduce((acc,i)=>acc+i.qty,0);
 
-  const renderBadge = () => {
-    const el = document.getElementById("cart-count");
-    if (el) el.textContent = count();
-  };
-
+const renderBadge = () => {
+  const el = document.getElementById("cart-count");
+  if (el){
+    el.textContent = count();
+    el.classList.remove('bump');
+    // forzar reflow para reiniciar animación
+    void el.offsetWidth;
+    el.classList.add('bump');
+  }
+};
   // Drawer UI
   const openDrawer = () => {
     document.getElementById("cart-drawer")?.classList.add("open");
