@@ -5,8 +5,5 @@ window.CIG_IMG_PAGES = [
   "img/cigarrillos/3.png",
   "img/cigarrillos/4.png",
   "img/cigarrillos/5.png",
-  "img/cigarrillos/6.png",
-  "img/cigarrillos/7.png",
-  "img/cigarrillos/8.png",
-  "img/cigarrillos/9.png"
+  "img/cigarrillos/6.png"
 ];
