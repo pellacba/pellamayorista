@@ -6,9 +6,15 @@
     <link rel="shortcut icon" href="img/pellalogo.png" type="image/x-icon">
     <link rel="stylesheet" href="styles/styles.css" />
     <link rel="stylesheet" href="styles/carrito.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
     <title>Cigarrillos</title>
 </head>
 <body>
+  <header class="page-header">
+      <a href="index.html" class="page-logo" aria-label="Volver a inicio">
+        <img src="img/pellablanco.png" alt="Pella" />
+      </a>
+  </header>
 
 <section id="flipbook" class="flipbook" aria-label="Catálogo Cigarrillos">
 
@@ -21,20 +27,44 @@
   </button>
 
   <!-- Drawer carrito -->
-  <aside id="cart-drawer" class="cart-drawer" aria-hidden="true">
-    <header class="cart-header">
-      <h2>Carrito</h2>
-      <button id="cart-close" class="cart-close" aria-label="Cerrar">✕</button>
-    </header>
-    <div id="cart-items" class="cart-items"></div>
-    <footer class="cart-footer">
-      <div class="totals"><span>Total</span> <strong id="cart-total">$0</strong></div>
-      <div class="cart-actions">
-        <button id="cart-clear" class="secondary">Vaciar</button>
-        <button id="cart-checkout">Continuar</button>
-      </div>
-    </footer>
-  </aside>
+<aside id="cart-drawer" class="cart-drawer handfont" inert aria-hidden="true">
+  <header class="cart-header">
+    <i class="cart-ico left"></i>
+    <h2>Carrito</h2>
+    <i class="cart-ico right"></i>
+    <button id="cart-close" class="cart-close" aria-label="Cerrar">✕</button>
+  </header>
+
+  <!-- Encabezado de columnas -->
+  <div class="cart-cols">
+    <span>Productos</span>
+    <span>Cantidad</span>
+  </div>
+
+  <div id="cart-items" class="cart-items"></div>
+
+<footer class="cart-footer">
+  <div class="totals">
+    <div class="tot-line">
+      <span>Productos (SKUs)</span>
+      <strong id="total-qty">0</strong>
+    </div>
+    <div class="tot-line">
+      <span>Unidades</span>
+      <strong id="total-count">0</strong>
+    </div>
+    <div class="tot-line">
+      <span>Total</span>
+      <strong id="cart-total">$0,00</strong>
+    </div>
+  </div>
+
+  <button id="cart-whatsapp" class="wa-btn" type="button">
+    <span class="wa-ico"></span>
+    Enviar pedido
+  </button>
+</footer>
+</aside>
   <div id="cart-backdrop" class="cart-backdrop" aria-hidden="true"></div>
 
   <!-- JS -->
