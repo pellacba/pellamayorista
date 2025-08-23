@@ -209,11 +209,7 @@ body {
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background: linear-gradient(
-    to bottom,
-    rgba(255, 255, 255, 0.22),
-    transparent 40%
-  );
+  background: linear-gradient(180deg, #111, #1f1f1f);
   pointer-events: none;
   mix-blend-mode: screen;
 }
@@ -676,3 +672,73 @@ input[type="number"]::-webkit-inner-spin-button{
   -webkit-appearance: none;
   margin: 0;
 }
+
+
+/* ===== Modal Seleccionar Vendedor (mínimo necesario) ===== */
+.seller-backdrop{
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.55);
+  opacity: 0; pointer-events: none;
+  transition: opacity .2s ease;
+  z-index: 60; /* por encima del carrito */
+}
+.seller-modal{
+  position: fixed; inset: 0;
+  display: grid; place-items: center;
+  opacity: 0; pointer-events: none;
+  transition: opacity .2s ease;
+  z-index: 61;
+}
+.seller-backdrop.open, .seller-modal.open{ opacity: 1; pointer-events: all; }
+
+.seller-card{
+  width: min(92vw, 520px);
+  max-height: min(78svh, 540px);
+  display: grid; grid-template-rows: auto 1fr;
+  background: var(--cart-bg);
+  color: var(--cart-text);
+  border: 1px solid var(--cart-bord);
+  border-radius: 18px;
+  box-shadow: 0 24px 64px rgba(0,0,0,.45);
+  overflow: hidden;
+  font-family: "Poppins", system-ui, sans-serif;
+}
+
+/* Header con título y botón cerrar */
+.seller-head{
+  position: relative;
+  display: flex; align-items: center; justify-content: center;
+  padding: 12px 48px 10px;
+  border-bottom: 1px solid var(--cart-bord);
+}
+.seller-head h3{
+  margin:0; font-weight:800; font-size: clamp(18px,3.2vw,20px);
+}
+.seller-close{
+  position: absolute; right: 12px; top: 10px;
+  width: 36px; height: 36px; border-radius: 10px;
+  border: 1px solid var(--cart-bord);
+  background: rgba(255,255,255,.06); color:#fff; cursor:pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.seller-close:hover{ background: rgba(255,255,255,.1); }
+
+/* Lista de vendedores (clickeable) */
+.seller-body{ padding: 10px 12px; overflow: auto; }
+.seller-list{ list-style:none; margin:0; padding:0; display:grid; gap:10px; }
+.seller-item{ padding:0; }
+
+.seller-pick{
+  width:100%;
+  display:grid; grid-template-columns: 1fr auto;
+  gap:8px; padding:12px;
+  background: var(--cart-card);
+  border:1px solid var(--cart-bord);
+  border-radius:12px;
+  cursor:pointer; text-align:left; color:var(--cart-text);
+  -webkit-tap-highlight-color: transparent;
+}
+.seller-pick:hover{ background: rgba(255,255,255,.06); }
+
+.seller-name{ font-weight:700; }
+.seller-phone{ color: var(--cart-muted); font-size:13px; }
