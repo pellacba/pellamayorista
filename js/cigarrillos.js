@@ -56,9 +56,9 @@ function render(){
         {
         name: it.name, sku: it.sku, price: it.price}); 
         
-        btn.classList.remove('pop');
+        btn.classList.remove('clicked');
         void btn.offsetWidth; // reflow para reiniciar
-        btn.classList.add('pop'); 
+        btn.classList.add('clicked'); 
       });
       hs.appendChild(btn);
       page.appendChild(hs);
