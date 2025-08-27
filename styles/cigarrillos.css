@@ -11,7 +11,15 @@
   --cart-accent: #3b82f6;
   --cart-accent-2: #22c55e;
 
-   --topbar-h: calc(56px + env(safe-area-inset-top, 0px));
+  --topbar-h: calc(56px + env(safe-area-inset-top, 0px));
+}
+
+/* Si el navegador soporta svh, usamos los tuyos */
+@supports (height: 1svh){
+  :root{
+    --page-h-mobile: clamp(70svh, 82svh, 88svh);
+    --page-h-desktop: clamp(78svh, 86svh, 92svh);
+  }
 }
 
 /* Página al 100% del viewport, sin márgenes ni scroll */
@@ -34,6 +42,9 @@ body {
   display: grid; /* centra el spread */
   place-items: center;
   max-width: 1700px;
+  min-height: 100vh;     /* fallback universal */
+  min-height: 100dvh;    /* viewport dinámico moderno */
+  min-height: 100svh;    /* iOS 16+ */
   margin-inline: auto;
   perspective: 1600px;
   user-select: none;
@@ -760,5 +771,4 @@ input[type="number"]::-webkit-inner-spin-button{
   -webkit-transform: translateZ(0);
   transform: translateZ(0);
   will-change: transform;
-}
-.flipbook { min-height: 100svh; } /* ayuda en iOS con barras dinámicas */
+}/* ayuda en iOS con barras dinámicas */
