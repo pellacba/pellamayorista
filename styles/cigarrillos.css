@@ -742,3 +742,22 @@ input[type="number"]::-webkit-inner-spin-button{
 
 .seller-name{ font-weight:700; }
 .seller-phone{ color: var(--cart-muted); font-size:13px; }
+
+/* iOS Safari – fixes visuales para imágenes en 3D */
+.flipbook { -webkit-perspective: 1600px; perspective: 1600px; }
+.leaf {
+  -webkit-transform-style: preserve-3d;
+  transform-style: preserve-3d;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+.leaf .face {
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+.page img, .leaf .face img {
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  will-change: transform;
+}
+.flipbook { min-height: 100svh; } /* ayuda en iOS con barras dinámicas */
