@@ -7,20 +7,25 @@ const nextZone = document.getElementById("nextZone");
 
 const isDesktop = () => window.matchMedia("(min-width:1024px)").matches;
 
-function ensurePct(v) {
-  // Acepta número o string; devuelve string %
-  return typeof v === "number" ? `${v}%` : v ?? "0%";
+// --------- NUEVO: cargar páginas desde JSON ----------
+async function loadPages() {
+  const res = await fetch("data/cigarrillos.pages.json", { cache: "no-store" });
+  if (!res.ok) throw new Error("No pude cargar data/cigarrillos.pages.json");
+  const arr = await res.json();
+  // normalizo a strings
+  return Array.isArray(arr) ? arr.map(String) : [];
 }
 
+// Utilidades para hotspots responsive
+function ensurePct(v) {
+  return typeof v === "number" ? `${v}%` : v ?? "0%";
+}
 function pickRect(item) {
-  // Si el item tiene pos.{mobile,desktop}, elegimos según el viewport
-  // Si no, caemos a los campos planos x,y,w,h (retrocompatible)
   const variant = item.pos
     ? isDesktop()
       ? item.pos.desktop || item.pos.mobile
       : item.pos.mobile || item.pos.desktop
     : item;
-
   return {
     x: ensurePct(variant.x ?? item.x),
     y: ensurePct(variant.y ?? item.y),
@@ -30,14 +35,14 @@ function pickRect(item) {
 }
 
 // Estado
-let pages = window.CIG_IMG_PAGES || [];
-let hotspotsMap = {}; // { idx:number -> items:[] }
-let index = 0; // índice base 0
+let pages = [];                  // ← antes venía de window.CIG_IMG_PAGES
+let hotspotsMap = {};            // { idx:number -> items:[] }
+let index = 0;                   // índice base 0
 
 // Carga hotspots
 async function loadHotspots() {
   try {
-    const res = await fetch("data/cigarrillos.hotspots.json");
+    const res = await fetch("data/cigarrillos.hotspots.json", { cache: "no-store" });
     const list = await res.json();
     list.forEach((p) => (hotspotsMap[p.idx] = p.items || []));
   } catch (e) {
@@ -57,12 +62,10 @@ function render() {
   for (let i = 0; i < perView; i++) {
     const idx = index + i;
     if (idx >= pages.length) break;
+
     const page = document.createElement("div");
     page.className = "page enter-active";
-    // animación de entrada acorde a dirección
-    page.classList.add(
-      i === 0 && perView === 1 ? "enter-from-right" : "enter-from-right"
-    );
+    page.classList.add(i === 0 && perView === 1 ? "enter-from-right" : "enter-from-right");
     requestAnimationFrame(() => page.classList.add("enter-active"));
 
     const img = document.createElement("img");
@@ -76,7 +79,6 @@ function render() {
       const hs = document.createElement("div");
       hs.className = "hotspot";
 
-      // ⬇️ NUEVO: tomar rect responsive
       const r = pickRect(it);
       hs.style.left = r.x;
       hs.style.top = r.y;
@@ -87,13 +89,13 @@ function render() {
       btn.className = "add-btn";
       btn.addEventListener("click", (e) => {
         e.stopPropagation();
-        window.Carrito.add({ name: it.name, sku: it.sku, price: it.price });
-
-        // feedback animación (más notoria si ya la definiste en CSS)
+        window.Carrito?.add({ name: it.name, sku: it.sku, price: it.price });
+        // feedback animación
         btn.classList.remove("clicked", "ripple");
-        void btn.offsetWidth; // reflow para reiniciar
+        void btn.offsetWidth;
         btn.classList.add("clicked", "ripple");
       });
+
       hs.appendChild(btn);
       page.appendChild(hs);
     });
@@ -102,7 +104,7 @@ function render() {
   }
 }
 
-// Navegación con animación
+// Navegación con animación (tu anim actual)
 function next() {
   const step = isDesktop() ? 2 : 1;
   if (index + step >= pages.length) return;
@@ -117,7 +119,6 @@ function prev() {
   index -= step;
   setTimeout(render, 480);
 }
-
 function animateOut(direction) {
   const currentPages = flipbook.querySelectorAll(".page");
   currentPages.forEach((p) => {
@@ -126,16 +127,14 @@ function animateOut(direction) {
   });
 }
 
+// Swipe/drag
 function enableSwipeDrag(container) {
   if (!container) return;
 
-  let down = false,
-    startX = 0,
-    dx = 0;
-  const TH = 60; // umbral px
+  let down = false, startX = 0, dx = 0;
+  const TH = 60;
   const spreadEl = () => container.querySelector(".spread");
 
-  // elementos donde NO debe iniciarse el drag
   const INTERACTIVE_SELECTOR = `
     .add-btn,
     button,
@@ -149,17 +148,13 @@ function enableSwipeDrag(container) {
   `;
 
   container.addEventListener("pointerdown", (e) => {
-    // si arrancó sobre algo interactivo, no drag
     if (e.target.closest(INTERACTIVE_SELECTOR)) return;
-
-    // solo botón izquierdo del mouse (o touch)
     if (e.pointerType === "mouse" && e.button !== 0) return;
 
     down = true;
     startX = e.clientX;
     dx = 0;
     container.classList.add("dragging");
-    // capturamos el puntero SOLO si no es elemento interactivo
     container.setPointerCapture?.(e.pointerId);
   });
 
@@ -193,25 +188,28 @@ function enableSwipeDrag(container) {
   container.addEventListener("pointercancel", endDrag);
 }
 
+// (Opcional) botones invisibles de borde si los usás
 function bindNav() {
-  nextBtn.addEventListener("click", next);
-  prevBtn.addEventListener("click", prev);
-  nextZone.addEventListener("click", next);
-  prevZone.addEventListener("click", prev);
-  enableSwipe(flipbook);
+  prevBtn?.addEventListener("click", prev);
+  nextBtn?.addEventListener("click", next);
+  prevZone?.addEventListener("click", prev);
+  nextZone?.addEventListener("click", next);
 }
-
-window.addEventListener("resize", () => {
-  // cuando cambia entre 1 y 2 páginas, normalizo el índice par
-  if (isDesktop() && index % 2 === 1) index -= 1;
-  render();
-});
 
 // Init
 (async function () {
+  try {
+    pages = await loadPages();        // ← AHORA desde JSON
+  } catch (err) {
+    console.error(err);
+    pages = [];
+  }
+
   await loadHotspots();
+
   if (isDesktop() && index % 2 === 1) index -= 1;
 
-  enableSwipeDrag(flipbook); // ← aquí
+  enableSwipeDrag(flipbook);
+  // bindNav(); // descomentá si usás zonas/botones de borde
   render();
 })();
