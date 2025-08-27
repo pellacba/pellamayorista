@@ -28,6 +28,7 @@ body {
 
 /* =============== FLIPBOOK =============== */
 .flipbook {
+  margin-top: 25px;
   height: 100%;
   width: 100%;
   display: grid; /* centra el spread */
