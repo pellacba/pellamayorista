@@ -1,5 +1,5 @@
 // js/cart.js
-const CART_KEY = "cart_v1";
+const CART_KEY = "cart_ofertas";
 
 const Cart = (() => {
   let state = { items: [] }; // { sku, name, price (num), qty }
@@ -229,7 +229,7 @@ function buildOrderMessageNoPrices(){
   const totalQty  = items.reduce((a,i)=>a+i.qty,0);
   const totalSkus = items.length;
 
-  return `¡Hola quiero hacer este pedido de CIGARRILLOS!:\n\n${lines.join("\n")}\n\n` 
+  return `¡Hola quiero hacer este pedido de OFERTAS!:\n\n${lines.join("\n")}\n\n` 
 }
 
 function sendOrderToSellerId(id){
