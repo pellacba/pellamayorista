@@ -1,9 +1,9 @@
 :root {
-  --bg-dark: #7c2d12;   /* naranja muy oscuro */
-  --bg-light: #ea580c;  /* naranja medio */
-  --text: #fff7ed;      /* casi blanco cálido */
-  --muted: #fcae73;     /* naranja suave */
-  --accent: #f97316;    /* naranja principal */
+  --bg-dark: #ED5023;   
+  --bg-light: #F7802D;  
+  --text: #fff7ed;      
+  --muted: #fcae73;     
+  --accent: #f97316;    
   --radius: 20px;
   --shadow-btn: 0 6px 18px rgba(249, 115, 22, 0.35);
   --maxw-mobile: 420px;
@@ -11,9 +11,8 @@
   --black: #000000;
   --white: #fff;
 
-  --page-h-mobile: 78svh;   /* casi toda la pantalla en mobile */
-  --page-h-desktop: 86svh;  /* más alta en desktop */
-
+  --page-h-mobile: 78svh;
+  --page-h-desktop: 86svh;
 }
 
 *,*::before,*::after { box-sizing: border-box; }
@@ -27,7 +26,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Centrado */
+
 .viewport {
   min-height: 100svh;
   padding: clamp(16px, 4vw, 32px);
@@ -35,7 +34,6 @@ body {
   place-items: center;
 }
 
-/* Card ahora solo organiza, no resalta */
 .card {
   width: 100%;
   max-width: var(--maxw-mobile);
@@ -50,21 +48,19 @@ body {
 }
 
 .logo {
-    width: 180px;
+  width: 180px;
   height: auto;
   margin-bottom: 2px;
   display: block;
   margin-left: auto;
   margin-right: auto;
 
-  /* Sombra + glow */
   filter: drop-shadow(0 0 12px rgba(0, 0, 0, 0.6));
   transition: transform 0.3s ease, filter 0.3s ease;
 
   animation: logoFadeIn 1s ease forwards;
 }
 
-/* Hover / interacción */
 .logo:hover {
   transform: scale(1.05);
   filter: drop-shadow(0 0 18px rgba(0, 0, 0, 0.85));
@@ -77,7 +73,6 @@ body {
   margin: 0;
 }
 
-/* Botones */
 .actions {
   display: grid;
   gap: 16px;
@@ -100,13 +95,13 @@ body {
 }
 
 .btn:hover {
-  background: #d9480f; /* más oscuro */
+  background: #d9480f;
   transform: translateY(-1px);
 }
 
 .btn:active {
   transform: translateY(0);
-  background: #b73e0d; /* aún más oscuro */
+  background: #b73e0d;
 }
 .btn:focus-visible {
   outline: 3px solid rgba(249, 115, 22, 0.45);
