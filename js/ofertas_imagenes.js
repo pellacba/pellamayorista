@@ -1,7 +1,5 @@
 window.CIG_IMG_PAGES = [
   "./img/ofertas/1.jpeg",
   "./img/ofertas/2.jpeg",
-  "./img/ofertas/3.jpeg",
-  "./img/ofertas/4.jpeg",
-  "./img/ofertas/5.jpeg"
+  "./img/ofertas/3.jpeg"
 ];
