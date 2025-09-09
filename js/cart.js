@@ -1,8 +1,7 @@
-// js/cart.js
 const CART_KEY = "cart_v1";
 
 const Cart = (() => {
-  let state = { items: [] }; // { sku, name, price (num), qty }
+  let state = { items: [] };
 
   const load = () => {
     try { state = JSON.parse(localStorage.getItem(CART_KEY)) || { items: [] }; }
@@ -46,24 +45,24 @@ const renderBadge = () => {
   if (el){
     el.textContent = count();
     el.classList.remove('bump');
-    // forzar reflow para reiniciar animación
+
     void el.offsetWidth;
     el.classList.add('bump');
   }
 };
-  // Drawer UI
+
 const openDrawer = () => {
   const drawer = document.getElementById("cart-drawer");
   const backdrop = document.getElementById("cart-backdrop");
   drawer?.classList.add("open");
   backdrop?.classList.add("show");
 
-  // habilitar interacción
+
   drawer?.removeAttribute("inert");
   drawer?.setAttribute("aria-hidden", "false");
 
   renderDrawer();
-  // foco al botón Cerrar
+ 
   document.getElementById("cart-close")?.focus();
 };
 const closeDrawer = () => {
@@ -114,16 +113,14 @@ const closeDrawer = () => {
     </div>
   `).join("");
 
-  // 🔹 Totales
 if (totalEl) totalEl.textContent = "$" + money(total());
 
-const qtyEl = document.getElementById("total-qty");   // total SKUs
+const qtyEl = document.getElementById("total-qty");   
 if (qtyEl) qtyEl.textContent = distinct();
 
-const countEl = document.getElementById("total-count"); // total unidades
+const countEl = document.getElementById("total-count"); 
 if (countEl) countEl.textContent = count();
 
-  // Bind events qty/remove
   wrap.querySelectorAll(".cart-item").forEach(row => {
     const sku = row.getAttribute("data-sku");
     row.querySelector(".inc")?.addEventListener("click", () => setQty(sku, Number(row.querySelector("input").value)+1));
@@ -134,21 +131,20 @@ if (countEl) countEl.textContent = count();
 
   renderBadge();
 };
-  // Expose
+
   return { load, add, clear, openDrawer, closeDrawer, setQty, remove, distinct };
 })();
 
-// FAB & Drawer bindings
+
 document.addEventListener("DOMContentLoaded", () => {
   Cart.load();
 
   document.getElementById("cart-fab")?.addEventListener("click", Cart.openDrawer);
   document.getElementById("cart-close")?.addEventListener("click", Cart.closeDrawer);
 
-  // Abrir modal de vendedores en lugar de mandar directo
   document.getElementById("cart-whatsapp")?.addEventListener("click", openSellerModal);
 
-  // Modal bindings
+
   document.getElementById("seller-close")?.addEventListener("click", closeSellerModal);
   document.getElementById("seller-cancel")?.addEventListener("click", closeSellerModal);
   document.getElementById("seller-confirm")?.addEventListener("click", sendOrderToSelectedSeller);
@@ -156,11 +152,10 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("seller-list")?.addEventListener("click", (e) => {
   const btn = e.target.closest(".seller-pick");
   if (!btn) return;
-  // Abrir WhatsApp directo SIN precios
+
   sendOrderToSellerId(btn.dataset.id);
 });
-  // Si querés evitar cerrar con backdrop:
-  // (No agregamos listener al backdrop para no cerrar al hacer click afuera)
+
 });
 
 
@@ -170,16 +165,15 @@ function closeDrawer() {
   drawer.classList.remove("open");
   drawer.setAttribute("aria-hidden", "true");
 
-  // devolver foco al FAB
+
   document.getElementById("cart-fab")?.focus();
 }
 
-// API global mínima
 window.Carrito = {
   add: ({name, sku, price}) => Cart.add({name, sku, price: Number(price||0), qty: 1})
 };
 
-// Contactos disponibles (editá nombres y teléfonos)
+
 const SELLERS = [
   { id: "v1", name: "Vendedor 1",  phone: "5493512260685" }
 ];
@@ -207,7 +201,6 @@ function closeSellerModal(){
   document.getElementById("seller-modal")?.setAttribute("aria-hidden","true");
 }
 
-// Construir mensaje y abrir WhatsApp al vendedor elegido
 function sendOrderToSelectedSeller(){
     const msg = buildOrderMessageNoPrices();
   if (!msg){ alert("El carrito está vacío."); return; }
@@ -216,8 +209,8 @@ function sendOrderToSelectedSeller(){
   if (!seller){ alert("Vendedor inválido."); return; }
 
   const url = `https://wa.me/${seller.phone}?text=${encodeURIComponent(msg)}`;
-  // window.open(url, "_blank");  // <- puede ser bloqueado
-  location.href = url;            // <- más fiable desde un click directo
+
+  location.href = url;            
   closeSellerModal();
 }
 

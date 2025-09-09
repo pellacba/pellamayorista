@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" href="img/pellablanco.png" type="image/x-icon">
+    <link rel="shortcut icon" href="img/pellalogo.png" type="image/x-icon">
     <link rel="preconnect" href="https://fonts.googleapis.com"> 
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -12,12 +12,10 @@
     <link rel="stylesheet" href="styles/animations.css">
     <link rel="stylesheet" href="styles/mediaconfg.css">
     <link rel="stylesheet" href="styles/onboarding.css">
-    
     <title>Pella Mayorista</title>
 </head>
 <body>
     <div class="viewport"> 
-    <!-- Tarjeta central -->
     <main class="card" role="main">
       <header class="brand">
         <img src="img/pcblancosinfondo.png" alt="Pella" class="logo">
@@ -27,45 +25,12 @@
       <nav class="actions" aria-label="Selección de catálogo">
         <button class="btn" data-link="cigarrillos.html">CIGARRILLOS</button>
         <button class="btn" data-link="ofertas.html">OFERTAS</button>
-        <!-- <button class="btn" data-link="catalogocompleto.html">PROXIMAMENTE</button>  -->
         
       </nav>
     </main>
     </div>
-    <!-- Onboarding Overlay -->
 <div id="onboarding" class="onboard-overlay hidden" data-redirect="index.html">
   <div class="onboard-container">
-    <!-- Slide 1 -->
-    <div class="onboard-slide active">
-      <h2>¡Bienvenido!</h2>
-      <img src="img/pcblancosinfondo.png" alt="Bienvenido" />
-      <p>¡PellaClick es una catalogo digital fácil de usar!</p>
-      
-    </div>
-
-    <!-- Slide 2 -->
-    <div class="onboard-slide">
-      <h2>Elegí que catalogo deseas ver</h2>
-      <img src="img/catalogosOpciones.png" alt="Catálogo" class="catalogosOpciones"/>
-    </div>
-
-    <!-- Slide 3 -->
-    <div class="onboard-slide">
-      <h2>Carrito inteligente</h2>
-      <p>Agrega productos fácilmente y gestiona tu compra en un solo lugar.</p>
-      <img src="img/onboard3.png" alt="Carrito" />
-    </div>
-
-    <!-- Slide 4 (Mayoría de edad) -->
-    <div class="onboard-slide">
-      <h2>Confirmación</h2>
-      <p>Para continuar, confirma que sos mayor de 18 años.</p>
-      <label class="adult-check">
-        <input type="checkbox" id="adult-check" /> Soy mayor de 18 años
-      </label>
-    </div>
-
-    <!-- Controles -->
     <div class="onboard-controls">
       <button id="prevBtn" class="hidden">Anterior</button>
       <button id="nextBtn">Siguiente</button>
@@ -74,7 +39,19 @@
   </div>
 </div>
 
+<div id="onboard" class="ob hidden" aria-hidden="true">
+  <div class="ob-wrap">
+    <img id="ob-img" class="ob-img" src="" alt="Onboarding" />
+    <div class="ob-cta">
+      <label id="ob-18wrap" class="ob-18 hidden">
+        <input id="ob-18" type="checkbox" />
+        <span>Soy mayor de 18 años</span>
+      </label>
 
+      <button id="ob-next" class="ob-btn">Siguiente</button>
+    </div>
+  </div>
+</div>
     <script src="js/app.js" defer></script>
     <script src="js/onboarding.js"></script>
 </body>
