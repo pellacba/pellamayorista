@@ -13,13 +13,13 @@
 
   // ====== CONFIG: tus imágenes ======
   const SLIDES = [
-    "img/omboarding/1.png",
-    "img/omboarding/2.png",
-    "img/omboarding/3.png",
-    "img/omboarding/4.png",
-    "img/omboarding/5.png", 
-    "img/omboarding/6.png",
-    "img/omboarding/7.png"// último slide tendrá el check +18
+    "img/omboarding/1.webp",
+    "img/omboarding/2.webp",
+    "img/omboarding/3.webp",
+    "img/omboarding/4.webp",
+    "img/omboarding/5.webp", 
+    "img/omboarding/6.webp",
+    "img/omboarding/7.webp"// último slide tendrá el check +18
   ];
 
   const root   = document.getElementById("onboard");
