@@ -77,3 +77,38 @@
   outline: none;
   box-shadow: none;
 }
+
+@media (min-width: 700px) {
+  .ob {
+    background: linear-gradient(90deg, #ff3131 0%, #ff914d 100%); 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ob-wrap {
+    max-width: 700px;    /* centra y limita el ancho total */
+    max-height: 90%;
+    background: transparent;
+  }
+
+  .ob-img {
+    max-width: 70%;      /* ocupa 70% del ancho del contenedor */
+    max-height: 70%;     /* se ajusta vertical */
+  }
+
+  .ob-cta {
+    display: flex;       /* botones en fila */
+    justify-content: center;
+    gap: 20px;
+    width: auto;
+    margin-top: 30px;
+  }
+
+  .ob-btn {
+    width: auto;         /* no se estiran a todo el ancho */
+    min-width: 180px;
+    font-size: 18px;
+    padding: 14px 24px;
+  }
+}

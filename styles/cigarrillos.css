@@ -771,4 +771,51 @@ input[type="number"]::-webkit-inner-spin-button{
   -webkit-transform: translateZ(0);
   transform: translateZ(0);
   will-change: transform;
-}/* ayuda en iOS con barras dinámicas */
+}
+
+.swipe-indicator {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 40px;
+  background: rgba(0,0,0,0.35);
+  border-radius: 90%;
+  display: grid;
+  place-items: center;
+  color: white;
+  font-size: 24px;
+  font-weight: 800;
+  cursor: default;
+  user-select: none;
+  pointer-events: none; /* no bloquea swipe/click */
+  z-index: 15;
+  animation: pulseSwipe 2s infinite;
+}
+
+.swipe-indicator.left {
+  left: 12px;
+}
+.swipe-indicator.right {
+  right: 12px;
+}
+
+/* Flechas con pseudo-elementos */
+.swipe-indicator.left::before {
+  content: "‹"; /* flecha izquierda */
+}
+.swipe-indicator.right::before {
+  content: "›"; /* flecha derecha */
+}
+
+/* Animación sutil */
+@keyframes pulseSwipe {
+  0%   { transform: translateY(-50%) scale(1); opacity: .8; }
+  50%  { transform: translateY(-50%) scale(1.2); opacity: 1; }
+  100% { transform: translateY(-50%) scale(1); opacity: .8; }
+}
+
+/* Opcional: solo mostrar en mobile (ocultar en desktop) */
+@media (min-width: 1024px) {
+  .swipe-indicator { display: none; }
+}
