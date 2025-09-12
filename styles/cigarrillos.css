@@ -783,7 +783,7 @@ input[type="number"]::-webkit-inner-spin-button{
   border-radius: 90%;
   display: grid;
   place-items: center;
-  color: white;
+  color: #ED5023;
   font-size: 24px;
   font-weight: 800;
   cursor: default;

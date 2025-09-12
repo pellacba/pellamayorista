@@ -88,7 +88,12 @@ function render() {
       btn.className = "add-btn";
       btn.addEventListener("click", (e) => {
         e.stopPropagation();
-        window.Carrito?.add({ name: it.name, sku: it.sku, price: it.price });
+        window.Carrito?.add({ 
+          name: it.name, 
+          sku: it.sku, 
+          price: it.price, 
+          multiple: it.multiple || 1   // 🔹 ahora sí pasa el múltiplo correcto
+        });
         // feedback animación
         btn.classList.remove("clicked", "ripple");
         void btn.offsetWidth;

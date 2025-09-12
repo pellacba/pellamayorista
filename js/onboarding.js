@@ -1,32 +1,36 @@
 (function () {
-  const KEY = 'over18';
+  const KEY = "over18";
 
   function isOver18() {
     try {
       const v = localStorage.getItem(KEY);
-      return v === '1' || v === 'true';
-    } catch { return false; }
+      return v === "1" || v === "true";
+    } catch {
+      return false;
+    }
   }
   function setOver18() {
-    try { localStorage.setItem(KEY, '1'); } catch {}
+    try {
+      localStorage.setItem(KEY, "1");
+    } catch {}
   }
 
-  // ====== CONFIG: tus imágenes ======
   const SLIDES = [
     "img/omboarding/1.webp",
     "img/omboarding/2.png",
     "img/omboarding/3.webp",
     "img/omboarding/4.webp",
-    "img/omboarding/5.webp", 
+    "img/omboarding/5.webp",
     "img/omboarding/6.webp",
-    "img/omboarding/7.webp"// último slide tendrá el check +18
+    "img/omboarding/7.webp" // último = check +18
   ];
 
-  const root   = document.getElementById("onboard");
-  const img    = document.getElementById("ob-img");
-  const next   = document.getElementById("ob-next");
+  const root = document.getElementById("onboard");
+  const img = document.getElementById("ob-img");
+  const next = document.getElementById("ob-next");
   const wrap18 = document.getElementById("ob-18wrap");
-  const check18= document.getElementById("ob-18");
+  const check18 = document.getElementById("ob-18");
+  const infoBtn = document.querySelector(".whatsapp-container");
 
   if (!root || !img || !next) return;
 
@@ -36,12 +40,29 @@
     return;
   }
 
+  // ocultamos el botón info mientras está el onboarding
+  if (infoBtn) infoBtn.style.display = "none";
+
   let i = 0;
-  function isLast() { return i === SLIDES.length - 1; }
+  function isLast() {
+    return i === SLIDES.length - 1;
+  }
   function show() {
     img.src = SLIDES[i];
     next.textContent = isLast() ? "Finalizar" : "Siguiente";
     wrap18.classList.toggle("hidden", !isLast());
+  }
+
+  function showToast(msg) {
+    let toast = document.querySelector(".toast");
+    if (!toast) {
+      toast = document.createElement("div");
+      toast.className = "toast";
+      document.body.appendChild(toast);
+    }
+    toast.textContent = msg;
+    toast.classList.add("show");
+    setTimeout(() => toast.classList.remove("show"), 3000);
   }
 
   next.addEventListener("click", () => {
@@ -51,17 +72,23 @@
       return;
     }
     if (!check18.checked) {
-      alert("Debés confirmar que sos mayor de 18 años.");
+      showToast("⚠️ Debés confirmar que sos mayor de 18 años.");
       return;
     }
     setOver18();
     root.remove();
-    // opcional: redirigir
-    // window.location.assign("index.html");
+    if (infoBtn) infoBtn.style.display = "block"; // vuelve a aparecer el botón info
   });
 
-  // Mostrar onboarding
   root.classList.remove("hidden");
-  root.setAttribute("aria-hidden","false");
+  root.setAttribute("aria-hidden", "false");
   show();
 })();
+
+// ✅ Función global para reiniciar onboarding (se llama desde el menú info)
+function resetOnboarding() {
+  try {
+    localStorage.removeItem("over18");
+  } catch (e) {}
+  location.reload();
+}
