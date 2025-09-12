@@ -8,17 +8,33 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <link rel="stylesheet" href="styles/styles.css" />
     <link rel="stylesheet" href="styles/animations.css">
     <link rel="stylesheet" href="styles/mediaconfg.css">
     <link rel="stylesheet" href="styles/onboarding.css">
-    <title>Pella Mayorista</title>
+
+        <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-P5KE5XME2V"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-P5KE5XME2V');
+    </script>
+    <title>PellaClick - Pella Mayorista</title>
+    <meta name="description" content="Pella Mayorista: catalogo digital">
 </head>
 <body>
+  <header class="brand">
+    <h1 class="site-title">Pella Mayorista</h1>
+  </header>
     <div class="viewport"> 
     <main class="card" role="main">
       <header class="brand">
-        <img src="img/pcblancosinfondo.png" alt="Pella" class="logo">
+        <img src="img/pclogo.png" alt="Pella" class="logo">
         <p class="subtitle">una forma fácil de comprar</p>
       </header>
 
@@ -52,6 +68,18 @@
     </div>
   </div>
 </div>
+
+  <div class="whatsapp-container">
+    <div class="whatsapp-button" onclick="toggleWhatsappMenu()">
+      <i class="fa-solid fa-info"></i>
+    </div>
+    <div class="whatsapp-menu" id="whatsapp-menu">
+      <div class="whatsapp-title">PellaClick</div>
+      <a href="#" onclick="resetOnboarding(); return false;">
+        <i class="fa-solid fa-info"></i> Como usar
+      </a>
+    </div>
+  </div>
     <script src="js/app.js" defer></script>
     <script src="js/onboarding.js"></script>
 </body>

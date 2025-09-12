@@ -8,3 +8,8 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 });
+
+function toggleWhatsappMenu() {
+  const menu = document.getElementById("whatsapp-menu");
+  menu.style.display = menu.style.display === "flex" ? "none" : "flex";
+}

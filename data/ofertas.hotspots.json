@@ -1,0 +1,258 @@
+[
+  {
+    "idx": 1,
+    "items": [
+      {
+        "name": "COMBO DURACELL + M FORCE",
+        "sku": "574",
+        "price": 10178.60,
+        "pos": {
+          "mobile": { "x": "15%", "y": "1%", "w": "28%", "h": "20%" },
+          "desktop": { "x": "31%", "y": "1%", "w": "24%", "h": "22%" }
+        }
+      },
+      {
+        "name": "CAJA JUGO RINDE DOS",
+        "sku": "1",
+        "price": 3718.14,
+        "pos": {
+          "mobile": { "x": "15%", "y": "37%", "w": "28%", "h": "20%" },
+          "desktop": { "x": "31%", "y": "48%", "w": "24%", "h": "22%" }
+        }
+      },
+      {
+        "name": "AFEITADORAS BIC COMFORT 3",
+        "sku": "40000004",
+        "price": 1057.363,
+        "pos": {
+          "mobile": { "x": "15%", "y": "62%", "w": "28%", "h": "20%" },
+          "desktop": { "x": "20%", "y": "67%", "w": "24%", "h": "22%" }
+        }
+      },
+      {
+        "name": "MAXI BIC",
+        "sku": "40000003",
+        "price": 1126.62,
+        "pos": {
+          "mobile": { "x": "67%", "y": "62%", "w": "28%", "h": "20%" },
+          "desktop": { "x": "65%", "y": "67%", "w": "24%", "h": "22%" }
+        }
+      },
+      {
+        "name": "MAXI BIC x256",
+        "sku": "40000003",
+        "price": 281774.60,
+        "pos": {
+          "mobile": { "x": "50%", "y": "62%", "w": "28%", "h": "20%" },
+          "desktop": { "x": "65%", "y": "67%", "w": "24%", "h": "22%" }
+        }
+      }
+
+    ]
+  },
+
+  {
+    "idx": 2,
+    "items": [
+      {
+        "name": "YERBA VERDE FLOR",
+        "sku": "2",
+        "price": 1486.84,
+        "pos": {
+          "mobile": { "x": "5%", "y": "1%", "w": "28%", "h": "20%" },
+          "desktop": { "x": "12%", "y": "1%", "w": "24%", "h": "22%" }
+        }
+      },
+
+      {
+        "name": "RASTA BLANCO",
+        "sku": "10187602",
+        "price": 959.04,
+        "qty": 9,
+        "multiple": 9,
+        "pos": {
+          "mobile": { "x": "33%", "y": "1%", "w": "28%", "h": "20%" },
+          "desktop": { "x": "36%", "y": "1%", "w": "24%", "h": "22%" }
+        }
+      },
+      {
+        "name": "RASTA NEGRO",
+        "sku": "10117356",
+        "price": 959.04,
+        "qty": 9,
+        "multiple": 9,
+        "pos": {
+          "mobile": { "x": "66%", "y": "1%", "w": "28%", "h": "20%" },
+          "desktop": { "x": "64%", "y": "1%", "w": "24%", "h": "22%" }
+        }
+      },
+      {
+        "name": "TOALLITAS Y PROTECTORES CALIPSO",
+        "sku": "2",
+        "price": 0,
+        "pos": {
+          "mobile": { "x": "5%", "y": "37%", "w": "28%", "h": "20%" },
+          "desktop": { "x": "12%", "y": "37%", "w": "24%", "h": "22%" }
+        }
+      },
+      {
+        "name": "TOALLITAS Y PROTECTORES NOSOTRAS",
+        "sku": "3",
+        "price": 0,
+        "pos": {
+          "mobile": { "x": "57%", "y": "37%", "w": "28%", "h": "20%" },
+          "desktop": { "x": "57%", "y": "37%", "w": "24%", "h": "22%" }
+        }
+      },
+      {
+        "name": "VOCACION INDIVIDUAL",
+        "sku": "1014638",
+        "price": 630.24,
+        "pos": {
+          "mobile": { "x": "1%", "y": "60%", "w": "11%", "h": "20%" },
+          "desktop": { "x": "1%", "y": "60%", "w": "20%", "h": "22%" }
+        }
+      },
+      {
+        "name": "VOCACION x3",
+        "sku": "1014362",
+        "price": 1575.44,
+        "qty": 3,
+        "multiple": 3,
+        "pos": {
+          "mobile": { "x": "19%", "y": "60%", "w": "28%", "h": "20%" },
+          "desktop": { "x": "24%", "y": "60%", "w": "24%", "h": "22%" }
+        }
+      },
+
+
+      {
+        "name": "SURTIDO LIA",
+        "sku": "1014902",
+        "price": 1476.86,
+        "pos": {
+          "mobile": { "x": "57%", "y": "60%", "w": "28%", "h": "20%" },
+          "desktop": { "x": "57%", "y": "60%", "w": "24%", "h": "22%" }
+        }
+      }
+      
+    ]
+  },
+
+  {
+    "idx": 3,
+    "items": [
+      {
+        "name": "SUEROX FRUTOS ROJOS",
+        "sku": "8110000974",
+        "price": 1511.18,
+        "qty": 6,
+        "multiple": 6,
+        "pos": {
+          "mobile": { "x": "1%", "y": "1%", "w": "28%", "h": "20%" },
+          "desktop": { "x": "4%", "y": "1%", "w": "24%", "h": "22%" }
+        }
+      },
+      {
+        "name": "SUEROX MANZANA",
+        "sku": "8110000910",
+        "price": 1511.18,
+        "qty": 6,
+        "multiple": 6,
+        "pos": {
+          "mobile": { "x": "23%", "y": "1%", "w": "28%", "h": "20%" },
+          "desktop": { "x": "25%", "y": "1%", "w": "24%", "h": "22%" }
+        }
+      },
+      {
+        "name": "SUEROX ARANDANO-POMELO",
+        "sku": "8110000911",
+        "price": 1511.18,
+        "qty": 6,
+        "multiple": 6,
+        "pos": {
+          "mobile": { "x": "47%", "y": "1%", "w": "28%", "h": "20%" },
+          "desktop": { "x": "47%", "y": "1%", "w": "24%", "h": "22%" }
+        }
+      },
+      {
+        "name": "SUEROX FRUTILLA-KIWI",
+        "sku": "8110000909",
+        "price": 1511.18,
+        "qty": 6,
+        "multiple": 6,
+        "pos": {
+          "mobile": { "x": "70%", "y": "1%", "w": "28%", "h": "20%" },
+          "desktop": { "x": "65%", "y": "1%", "w": "24%", "h": "22%" }
+        }
+      },
+
+      {
+        "name": "HAMBLETON x 16UN",
+        "sku": "1013835",
+        "price": 7171.93,
+        "pos": {
+          "mobile": { "x": "5%", "y": "37%", "w": "28%", "h": "20%" },
+          "desktop": { "x": "12%", "y": "37%", "w": "24%", "h": "22%" }
+        }
+      },
+      {
+        "name": "ALF FANTOCHE XS NEGRO",
+        "sku": "2014657",
+        "price": 246.77,
+        "qty": 20,
+        "multiple": 20,
+        "pos": {
+          "mobile": { "x": "59%", "y": "30%", "w": "28%", "h": "20%" },
+          "desktop": { "x": "59%", "y": "30%", "w": "24%", "h": "22%" }
+        }
+      },
+      {
+        "name": "ALF FANTOCHE XS BLANCO",
+        "sku": "2014664",
+        "price": 246.77,
+        "qty": 20,
+        "multiple": 20,
+        "pos": {
+          "mobile": { "x": "43%", "y": "45%", "w": "28%", "h": "20%" },
+          "desktop": { "x": "43%", "y": "45%", "w": "24%", "h": "22%" }
+        }
+      },
+
+
+      {
+        "name": "BOCADITO FANTOCHE x 20UN",
+        "sku": "2014596",
+        "price": 268.53,
+        "qty": 20,
+        "multiple": 20,
+        "pos": {
+          "mobile": { "x": "5%", "y": "65%", "w": "28%", "h": "20%" },
+          "desktop": { "x": "12%", "y": "65%", "w": "24%", "h": "22%" }
+        }
+      },
+      {
+        "name": "ALF FANTOCHE TRIPLE BLANCO",
+        "sku": "91584",
+        "price": 653.14,
+        "qty": 6,
+        "multiple": 6,
+        "pos": {
+          "mobile": { "x": "70%", "y": "65%", "w": "28%", "h": "20%" },
+          "desktop": { "x": "66%", "y": "65%", "w": "24%", "h": "22%" }
+        }
+      },
+      {
+        "name": "ALF FANTOCHE TRIPLE NEGRO",
+        "sku": "91577",
+        "price": 653.14,
+        "qty": 6,
+        "multiple": 6,
+        "pos": {
+          "mobile": { "x": "39%", "y": "65%", "w": "28%", "h": "20%" },
+          "desktop": { "x": "39%", "y": "65%", "w": "24%", "h": "22%" }
+        }
+      }
+    ]
+  }
+]

@@ -112,3 +112,25 @@
     padding: 14px 24px;
   }
 }
+
+.toast {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.9);
+  background: #ef4444;
+  color: #fff;
+  padding: 18px 24px;
+  border-radius: 14px;
+  font: 700 16px/1.4 "League Spartan", system-ui, sans-serif;
+  text-align: center;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  z-index: 10000;
+}
+.toast.show {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
