@@ -17,7 +17,7 @@
 
   const SLIDES = [
     "img/omboarding/1.webp",
-    "img/omboarding/2.png",
+    "img/omboarding/2.webp",
     "img/omboarding/3.webp",
     "img/omboarding/4.webp",
     "img/omboarding/5.webp",
