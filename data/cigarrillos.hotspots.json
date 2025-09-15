@@ -180,7 +180,7 @@
       {
         "name": "LS RED BOX 12",
         "sku": "10089548",
-        "price": 502.18,
+        "price": 2430.27,
         "pos": {
           "mobile": {
             "x": "6%",
@@ -199,7 +199,7 @@
       {
         "name": "LS RED BOX 20",
         "sku": "10083661",
-        "price": 847.41,
+        "price": 4090.84,
         "pos": {
           "mobile": {
             "x": "38%",
@@ -218,7 +218,7 @@
       {
         "name": "LS RED KS 20",
         "sku": "10083634",
-        "price": 763.89,
+        "price": 3704.67,
         "pos": {
           "mobile": {
             "x": "69%",
@@ -279,9 +279,9 @@
     "idx": 4,
     "items": [
       {
-        "name": "LS RED BOX 20",
+        "name": "ORIGEN RED BOX 20",
         "sku": "10083661",
-        "price": 4099.84,
+        "price": 2420.37,
         "pos": {
           "mobile": {
             "x": "6%",
@@ -298,9 +298,9 @@
         }
       },
       {
-        "name": "LS RED KS 20",
+        "name": "ORIGEN RED KS 20",
         "sku": "10083634",
-        "price": 3704.67,
+        "price": 2123.99,
         "pos": {
           "mobile": {
             "x": "38%",
@@ -317,9 +317,9 @@
         }
       },
       {
-        "name": "LS RED BOX 12",
+        "name": "ORIGEN RED BOX 10",
         "sku": "10089548",
-        "price": 2430.27,
+        "price": 1284.28,
         "pos": {
           "mobile": {
             "x": "69%",
