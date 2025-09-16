@@ -175,7 +175,8 @@ window.Carrito = {
 
 
 const SELLERS = [
-  { id: "v1", name: "Jhonatan",  phone: "5493516645324" }
+  { id: "v1", name: "Jhonatan",  phone: "5493516645324" },
+  { id: "v2", name: "Naza",  phone: "5493516645332" }
 ];
 
 function openSellerModal(){
