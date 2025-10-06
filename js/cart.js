@@ -175,8 +175,9 @@ window.Carrito = {
 
 
 const SELLERS = [
-  { id: "v1", name: "Jhonatan",  phone: "5493516645324" },
-  { id: "v2", name: "Naza",  phone: "5493516645332" }
+  { id: "v1", name: "Jhonatan",  phone: "5493516645324", photo: "img/vendedores/7.png" },
+  { id: "v2", name: "Naza",  phone: "5493516645332" , photo: "img/vendedores/8.png"  },
+  { id: "v3", name: "Benjamín",  phone: "5493516645373" , photo: "img/vendedores/3.png"  }
 ];
 
 function openSellerModal(){
@@ -184,8 +185,9 @@ function openSellerModal(){
   if (list){
     list.innerHTML = SELLERS.map(s => `
       <li class="seller-item">
-        <button type="button" class="seller-pick" data-id="${s.id}">
+        <button type="button" class="seller-pick" data-id="${s.id}"> 
           <div class="seller-name">${s.name}</div>
+          <img src="${s.photo}" alt="${s.name}" class="seller-photo" />
         </button>
       </li>
     `).join("");
