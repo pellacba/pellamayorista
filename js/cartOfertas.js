@@ -211,9 +211,9 @@ window.Carrito = {
 
 // Contactos disponibles (editá nombres y teléfonos)
 const SELLERS = [
-  { id: "v1", name: "Jhonatan",  phone: "5493516645324", photo: "img/vendedores/7.png" },
-  { id: "v2", name: "Naza",  phone: "5493516645332" , photo: "img/vendedores/8.png"  },
-  { id: "v3", name: "Benjamín",  phone: "5493516645373" , photo: "img/vendedores/3.png"  }
+  { id: "v1", name: "Jhonatan",  phone: "5493516645324", photo: "img/vendedores/7.webp" },
+  { id: "v2", name: "Naza",  phone: "5493516645332" , photo: "img/vendedores/8.webp"  },
+  { id: "v3", name: "Benjamín",  phone: "5493516645373" , photo: "img/vendedores/3.webp"  }
 ];
 
 function openSellerModal(){
