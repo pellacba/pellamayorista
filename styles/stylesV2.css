@@ -1,0 +1,232 @@
+
+:root{
+  --header-h: 78px;                 
+  --gap-d: 20px;                     
+  --gap-m: 14px;                     
+  --radius: 22px;
+  --card-bg-top: #f6f7f7b9;
+  --card-bg-bot: #ffffffa6;
+  --text-dark: #0a0f1c;
+  --btn-shadow: 0 10px 22px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.65);
+}
+
+body{
+  background:linear-gradient(90deg, #ff3131 0%, #ff914d 100%);
+  font-family: 'Poppins', system-ui, sans-serif;
+  margin: 0;
+}
+
+html.ofertas-page,
+body.ofertas-page{
+  overflow-y: auto !important;
+  height: auto !important;
+}
+
+.page-header{
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: var(--header-h);
+  display: flex; align-items: center;
+  padding: 6px 12px;
+  z-index: 20;
+  background: transparent;
+}
+
+
+.catalogo-grid{
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);     
+  grid-template-rows: repeat(3, 1fr);       
+  gap: var(--gap-d);
+  padding: 20px;
+  padding-top: calc(var(--header-h) + 12px); 
+  min-height: calc(100svh - var(--header-h));
+  box-sizing: border-box;
+}
+
+.card{
+  display: grid;
+  grid-template-rows: auto 1fr auto auto;
+  align-items: end;
+  background: linear-gradient(180deg, var(--card-bg-top) 0%, var(--card-bg-bot) 100%);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: 0 8px 20px rgba(0,0,0,.2);
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.card-img{
+  display: grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: 1/0.8;
+  border-radius: calc(var(--radius) - 6px);
+  overflow: hidden;
+}
+.card-img img{
+  width: clamp(48%, 60%, 72%);
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 10px rgba(0,0,0,.15));
+  user-select: none; -webkit-user-drag: none;
+}
+
+.card-row{
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 8px;
+}
+.card-title{
+  margin: 0;
+  color: var(--text-dark);
+  font-weight: 800;
+  font-size: clamp(14px, 2.2vw, 20px);
+  line-height: 1.1;
+  display: -webkit-box;
+
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.card-price {
+  margin: 8px auto 0;           
+  color: #ffdd00;
+  font-weight: 800;
+  font-size: 21px;
+
+  display: inline-block;        
+  background-color: #ff3131;
+  border-radius: 32px;
+  padding: 4px 12px;           
+  line-height: 1.2;
+}
+
+.card-mult{
+  margin-top: 4px;
+  font-weight: 700;
+  font-size: 12px;
+  color: #0a0f1c;
+  opacity: .7;
+}
+
+
+.card-add {
+  margin-top: 10px;
+  width: 100%;
+  border: 0;
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--text-dark);
+  font-family: 'Poppins', sans-serif;
+  font-size: medium;
+  font-weight: bold;
+  padding: 12px 16px;
+  box-shadow: var(--btn-shadow);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
+  overflow: hidden;   
+  transition: transform .06s ease, filter .15s ease;
+}
+
+.card-add:active { 
+  transform: translateY(1px); 
+  filter: brightness(.95); 
+}
+
+/* Ripple más notorio */
+.card-add::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(255, 49, 49, 0.55); 
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.card-add:active::after {
+  animation: ripple-strong 0.50s ease-out;
+}
+
+@keyframes ripple-strong {
+  0%   { width: 0; height: 0; opacity: 0.8; }
+  50%  { width: 250%; height: 250%; opacity: 0.5; }
+  100% { width: 400%; height: 400%; opacity: 0; }
+}
+
+@media (max-width: 768px){
+  .catalogo-grid{
+    grid-template-columns: repeat(2, 1fr);   
+    grid-template-rows: repeat(4, 1fr);      
+    gap: var(--gap-m);
+    padding: 12px;
+    padding-top: calc(var(--header-h) + 10px);
+    min-height: calc(100svh - var(--header-h));
+  }
+
+  .card-title{ font-size: 13px; }
+  .card-price{ font-size: 18px; }
+}
+
+
+.transition-screen {
+  position: fixed;
+  inset: 0;
+  background:linear-gradient(90deg, #ff3131 0%, #ff914d 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  animation: fadeOutScreen 2s forwards;
+  animation-delay: 1.5s;
+}
+
+.transition-logo {
+  width: 120px;
+  height: auto;
+  animation: spinLogo 1.5s ease-in-out forwards;
+}
+
+@keyframes spinLogo {
+  0%   { transform: rotate(0deg) scale(1); opacity: 1; }
+  60%  { transform: rotate(360deg) scale(1.2); opacity: 1; }
+  100% { transform: rotate(720deg) scale(0.8); opacity: 0; }
+}
+
+@keyframes fadeOutScreen {
+  to { opacity: 0; visibility: hidden; }
+}
+
+/* Card destacada */
+.card.destacado {
+  border: 2px solid #a855f7; /* violeta */
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.8),
+              0 0 40px rgba(168, 85, 247, 0.6);
+  animation: fuego 1.5s infinite alternate;
+  position: relative;
+}
+
+/* Efecto de resplandor */
+@keyframes fuego {
+  0% {
+    box-shadow: 0 0 15px rgba(168, 85, 247, 0.6),
+                0 0 30px rgba(168, 85, 247, 0.4);
+    transform: scale(1);
+  }
+  100% {
+    box-shadow: 0 0 30px rgba(168, 85, 247, 1),
+                0 0 60px rgba(168, 85, 247, 0.9);
+    transform: scale(1.03);
+  }
+}
+
+/* Opcional: etiqueta “🔥 Destacado” arriba de la card */
