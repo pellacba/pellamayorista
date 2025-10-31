@@ -29,7 +29,7 @@ body.ofertas-page{
   display: flex; align-items: center;
   padding: 6px 12px;
   z-index: 20;
-  background: transparent;
+    background: linear-gradient(90deg, #ff3131 0%, #ff914d 100%);
 }
 
 
@@ -39,7 +39,7 @@ body.ofertas-page{
   grid-template-rows: repeat(3, 1fr);       
   gap: var(--gap-d);
   padding: 20px;
-  padding-top: calc(var(--header-h) + 12px); 
+  padding-top: 8px; 
   min-height: calc(100svh - var(--header-h));
   box-sizing: border-box;
 }
@@ -169,7 +169,7 @@ body.ofertas-page{
     grid-template-rows: repeat(4, 1fr);      
     gap: var(--gap-m);
     padding: 12px;
-    padding-top: calc(var(--header-h) + 10px);
+    padding-top:20px;
     min-height: calc(100svh - var(--header-h));
   }
 
@@ -229,4 +229,106 @@ body.ofertas-page{
   }
 }
 
-/* Opcional: etiqueta “🔥 Destacado” arriba de la card */
+/* ===== Toolbar (buscador + filtros) ===== */
+.toolbar{
+  position: sticky;
+  top: var(--header-h);
+  z-index: 15;
+  padding: 20px;
+  margin-top: calc(var(--header-h) - 14px);
+  background: linear-gradient(90deg, #ff3131 0%, #ff914d 100%);
+}
+
+.toolbar-row{
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.search-box{
+  height: 42px;
+  border-radius: 12px;
+  border: 0;
+  padding: 0 14px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 16px;
+  outline: none;
+  background: #ffffffea;
+  color: #0a0f1c;
+  box-shadow: 0 8px 16px rgba(0,0,0,.18);
+}
+
+.filters-btn{
+  width: 42px; height: 42px;
+  border-radius: 12px; border: 0;
+  background: #ffffffea;
+  font-size: 22px; font-weight: 800; line-height: 1;
+  box-shadow: 0 8px 16px rgba(0,0,0,.18);
+  cursor: pointer;
+}
+
+.filters-pop{
+  max-width: 980px;
+  margin: 10px auto 0;
+  padding: 10px;
+  border-radius: 14px;
+  background: #ffffffc8;
+  color: #0a0f1c;
+  box-shadow: 0 10px 24px rgba(0,0,0,.22);
+}
+
+.seg-group{ display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 6px; }
+.cat-group .cat-title{ font-weight: 700; font-size: 13px; opacity: .8; }
+.chips{ display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+
+.chip{
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 10px;
+  background: #fff;
+  border-radius: 999px;
+  border: 1px solid rgba(0,0,0,.08);
+  font-size: 13px; font-weight: 700;
+  cursor: pointer;
+  user-select: none;
+}
+.chip input{ accent-color: #ff3131; }
+
+/* ===== FAB de búsqueda plegada ===== */
+.search-fab{
+  position: fixed;
+  left: 10px;
+  top: calc(var(--header-h) + 1000008px);
+  width: 48px; height: 48px;
+  border: 0;
+  border-radius: 999px;
+  display: grid; place-items: center;
+  background: #ffffffdd;
+  color: #0a0f1c;
+  box-shadow: 0 10px 24px rgba(0,0,0,.25);
+  backdrop-filter: blur(4px);
+  opacity: 0;
+  transform: translateX(-8px);
+  pointer-events: none;
+  transition: opacity .22s ease, transform .22s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.search-fab.show{
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+.search-fab .ico{
+  font-size: 22px;
+  line-height: 1;
+}
+
+/* opcional: que no tape el carrito en pantallas chicas */
+@media (max-width: 480px){
+  .search-fab{ left: 10px; top: calc(var(--header-h) + 8px); }
+}
+
+

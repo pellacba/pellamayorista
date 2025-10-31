@@ -32,6 +32,24 @@
       </a>
   </header>
 
+  <section class="toolbar" aria-label="Herramientas de catálogo">
+  <div class="toolbar-row">
+    <input id="search-box" class="search-box" type="search" placeholder="buscador" aria-label="Buscar productos" autocomplete="off">
+    <button id="filters-btn" class="filters-btn" aria-haspopup="true" aria-expanded="false" aria-controls="filters-pop" title="Filtros">⋮</button>
+  </div>
+
+  <div id="filters-pop" class="filters-pop" hidden>
+    <div class="cat-group">
+      <span class="cat-title">Categorías</span>
+      <div id="cats-wrap" class="chips"></div>
+    </div>
+  </div>
+</section>
+
+<button id="search-fab" class="search-fab" aria-label="Abrir buscador" hidden>
+  <span class="ico">🔎</span>
+</button>
+
 <section id="catalogo" class="catalogo-grid"></section>
 
   <!-- FAB carrito -->
@@ -84,9 +102,7 @@
   <!-- JS -->
   <script src="js/cartOfertas.js" defer></script>
       <script type="module" src="js/ofertasapi.js"></script>
-  <script src="js/ofertas_imagenes.js" defer></script>
   <script src="js/ofertas.js" defer></script>
-  <script src="js/hotspot-picker.js"></script>
 
   <!-- Modal Seleccionar Vendedor -->
 <div id="seller-backdrop" class="seller-backdrop" aria-hidden="true"></div>

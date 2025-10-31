@@ -32,6 +32,24 @@
       </a>
   </header>
 
+<section class="toolbar" aria-label="Herramientas de catálogo">
+  <div class="toolbar-row">
+    <input id="search-box" class="search-box" type="search" placeholder="buscador" aria-label="Buscar productos" autocomplete="off">
+    <button id="filters-btn" class="filters-btn" aria-haspopup="true" aria-expanded="false" aria-controls="filters-pop" title="Filtros">⋮</button>
+  </div>
+
+  <div id="filters-pop" class="filters-pop" hidden>
+    <div class="cat-group">
+      <span class="cat-title">Categorías</span>
+      <div id="cats-wrap" class="chips"></div>
+    </div>
+  </div>
+</section>
+
+<button id="search-fab" class="search-fab" aria-label="Abrir buscador" hidden>
+  <span class="ico">🔎</span>
+</button>
+
 <section id="flipbook" class="flipbook" aria-label="Catálogo Cigarrillos">
   <div class="swipe-indicator left"></div>
   <div class="swipe-indicator right"></div>
@@ -86,7 +104,6 @@
 
   <!-- JS -->
   <script src="js/cart.js" defer></script>
-  <script src="js/cigarrillos-imagenes.js" defer></script>
   <script src="js/cigarrillosapi.js" defer></script>
 
   <!-- Modal Seleccionar Vendedor -->
