@@ -247,8 +247,11 @@ function sendOrderToSelectedSeller(){
   const seller = SELLERS.find(s => s.id === id);
   if (!seller){ alert("Vendedor inválido."); return; }
 
+  // === KPI ===
+  logSellerPickKPI(seller);
+
   const url = `https://wa.me/${seller.phone}?text=${encodeURIComponent(msg)}`;
-  location.href = url; 
+  location.href = url;
   closeSellerModal();
 }
 
@@ -262,9 +265,66 @@ function buildOrderMessageNoPrices(){
 function sendOrderToSellerId(id){
   const msg = buildOrderMessageNoPrices();
   if (!msg){ alert("El carrito está vacío."); return; }
+
   const seller = SELLERS.find(s => s.id === id);
   if (!seller){ alert("Vendedor inválido."); return; }
+
+  // === KPI: registra selección ===
+  logSellerPickKPI(seller);
+
   const url = `https://wa.me/${seller.phone}?text=${encodeURIComponent(msg)}`;
   window.open(url, "_blank");
   closeSellerModal();
 }
+
+const KPI_SELLER_URL = 'https://script.google.com/macros/s/AKfycbzk_VO0banLC9AAcGDI1ql7cQfvEPT6jxb-G59wZmBRb9hgdt3srtbeZslUNt4UgbOC/exec'; // <-- pega aquí tu URL
+
+// Lee métricas del carrito desde localStorage (usa tu misma clave del carrito)
+function getCartMetrics() {
+  const KEY = (typeof CART_KEY === 'string' && CART_KEY) ? CART_KEY : 'cart_v1';
+  try {
+    const st = JSON.parse(localStorage.getItem(KEY)) || { items: [] };
+    const items = Array.isArray(st.items) ? st.items : [];
+    const cart_skus  = items.length;                                       // cantidad de SKUs
+    const cart_units = items.reduce((a,i)=> a + Number(i.qty || 0), 0);    // suma de cantidades
+    const cart_total = items.reduce((a,i)=> a + (Number(i.price || 0) * Number(i.qty || 0)), 0);
+    // redondeo a 2 decimales sin formatear (número “crudo”)
+    const cart_total_num = Math.round(cart_total * 100) / 100;
+    return { cart_skus, cart_units, cart_total: cart_total_num };
+  } catch {
+    return { cart_skus: 0, cart_units: 0, cart_total: 0 };
+  }
+}
+
+// Enviar KPI con vendedor + métricas del carrito
+function logSellerPickKPI(seller) {
+  if (!seller) return;
+
+  const { cart_skus, cart_units, cart_total } = getCartMetrics();
+
+  const payload = {
+    seller_id: seller.id || '',
+    seller_name: seller.name || '',
+    cart_skus,
+    cart_units,
+    cart_total,
+    source: location.pathname
+  };
+
+  // 1) Preferí sendBeacon (no bloquea la navegación a WhatsApp y evita CORS visible)
+  if (navigator.sendBeacon) {
+    const blob = new Blob([JSON.stringify(payload)], { type: 'text/plain' });
+    navigator.sendBeacon(KPI_SELLER_URL, blob);
+    return;
+  }
+
+  // 2) Fallback: request “simple” sin preflight (evita CORS)
+  const body = new URLSearchParams({ payload: JSON.stringify(payload) }).toString();
+  fetch(KPI_SELLER_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+    body
+  }).catch(()=>{});
+}
+
