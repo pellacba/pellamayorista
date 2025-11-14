@@ -258,20 +258,16 @@ function sendOrderToSelectedSeller(){
 function buildOrderMessageNoPrices(){
   const items = JSON.parse(localStorage.getItem(CART_KEY) || '{"items":[]}').items || [];
   if (!items.length) return null;
-  const lines = items.map(it => `• ${it.name} , Cantidad: ${it.qty}`);
+  const lines = items.map(it => `• ${it.name} , Cantidad: ${it.qty}, Precio: ${it.price}`);
   return `¡Hola quiero hacer este pedido de OFERTAS!:\n\n${lines.join("\n")}\n\n`;
 }
 
 function sendOrderToSellerId(id){
   const msg = buildOrderMessageNoPrices();
   if (!msg){ alert("El carrito está vacío."); return; }
-
   const seller = SELLERS.find(s => s.id === id);
   if (!seller){ alert("Vendedor inválido."); return; }
-
-  // === KPI: registra selección ===
   logSellerPickKPI(seller);
-
   const url = `https://wa.me/${seller.phone}?text=${encodeURIComponent(msg)}`;
   window.open(url, "_blank");
   closeSellerModal();
@@ -279,16 +275,15 @@ function sendOrderToSellerId(id){
 
 const KPI_SELLER_URL = 'https://script.google.com/macros/s/AKfycbzk_VO0banLC9AAcGDI1ql7cQfvEPT6jxb-G59wZmBRb9hgdt3srtbeZslUNt4UgbOC/exec'; // <-- pega aquí tu URL
 
-// Lee métricas del carrito desde localStorage (usa tu misma clave del carrito)
+
 function getCartMetrics() {
   const KEY = (typeof CART_KEY === 'string' && CART_KEY) ? CART_KEY : 'cart_v1';
   try {
     const st = JSON.parse(localStorage.getItem(KEY)) || { items: [] };
     const items = Array.isArray(st.items) ? st.items : [];
-    const cart_skus  = items.length;                                       // cantidad de SKUs
-    const cart_units = items.reduce((a,i)=> a + Number(i.qty || 0), 0);    // suma de cantidades
+    const cart_skus  = items.length;                                     
     const cart_total = items.reduce((a,i)=> a + (Number(i.price || 0) * Number(i.qty || 0)), 0);
-    // redondeo a 2 decimales sin formatear (número “crudo”)
+
     const cart_total_num = Math.round(cart_total * 100) / 100;
     return { cart_skus, cart_units, cart_total: cart_total_num };
   } catch {
@@ -296,12 +291,10 @@ function getCartMetrics() {
   }
 }
 
-// Enviar KPI con vendedor + métricas del carrito
+
 function logSellerPickKPI(seller) {
   if (!seller) return;
-
   const { cart_skus, cart_units, cart_total } = getCartMetrics();
-
   const payload = {
     seller_id: seller.id || '',
     seller_name: seller.name || '',
@@ -310,15 +303,11 @@ function logSellerPickKPI(seller) {
     cart_total,
     source: location.pathname
   };
-
-  // 1) Preferí sendBeacon (no bloquea la navegación a WhatsApp y evita CORS visible)
   if (navigator.sendBeacon) {
     const blob = new Blob([JSON.stringify(payload)], { type: 'text/plain' });
     navigator.sendBeacon(KPI_SELLER_URL, blob);
     return;
   }
-
-  // 2) Fallback: request “simple” sin preflight (evita CORS)
   const body = new URLSearchParams({ payload: JSON.stringify(payload) }).toString();
   fetch(KPI_SELLER_URL, {
     method: 'POST',
