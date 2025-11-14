@@ -1,6 +1,6 @@
 const SUPABASE_URL  = "https://xwuprneexjwzjttujbiu.supabase.co";
 const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh3dXBybmVleGp3emp0dHVqYml1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkxNzA4OTksImV4cCI6MjA3NDc0Njg5OX0.sVQrMzIObXgHvlVhWD3C2SD3Z0_tiG9Kc48PrTIEovs";
-const TABLE = "OFERTAS";
+const TABLE = "PRODUCTOS";
 
 const STORAGE_BASE = `${SUPABASE_URL}/storage/v1/object/public/productos/`;
 const money = n => Number(n || 0).toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -14,8 +14,8 @@ async function fetchOfertas() {
   // Alias de columna: si en la BD se llama "Categoria", llega como CATEGORIA en el JSON
   const url =
     `${SUPABASE_URL}/rest/v1/${TABLE}`
-    + `?select=PRODUCTO,DESCRIPCION,PRECIO,MULTIPLO,DESTACADO`
-    + `&order=DESTACADO.asc`;
+    + `?select=CodigoProd,Descripcion,PrecioFinal,Proveedor,Categoria,Multiplos, ORDEN`
+    + `&order=ORDEN.asc, Proveedor`;
 
   const res = await fetch(url, {
     headers: { apikey: SUPABASE_ANON, Authorization: `Bearer ${SUPABASE_ANON}` },
@@ -31,7 +31,7 @@ async function fetchOfertas() {
 
 function imgUrl(pathOrSku) {
   const path = (pathOrSku || '') + '';
-  const finalPath = path.includes('/') ? path : `ofertas/${path}.webp`;
+  const finalPath = path.includes('/') ? path : `productos/${path}.png`;
   return `${STORAGE_BASE}${encodeURIComponent(finalPath)}?width=480&quality=80`;
 }
 
@@ -41,10 +41,10 @@ function renderCards(container, items) {
   if (!Array.isArray(items)) items = [];
 
   container.innerHTML = items.map(row => {
-    const sku      = row.PRODUCTO;
-    const name     = row.DESCRIPCION;
-    const price    = Number(row.PRECIO || 0);
-    const multiple = Number(row.MULTIPLO || 1);
+    const sku      = row.CodigoProd;
+    const name     = row.Descripcion;
+    const price    = Number(row.PrecioFinal || 0);
+    const multiple = Number(row.Multiplos || 1);
     const path     = row.IMG_PATH || sku;
     const src      = imgUrl(path);
 
@@ -87,14 +87,14 @@ function applyFilters() {
 
   // por categoría
   if (state.cat !== "todas") {
-    out = out.filter(r => (r.CATEGORIA || "").toLowerCase() === state.cat.toLowerCase());
+    out = out.filter(r => (r.Categoria || "").toLowerCase() === state.cat.toLowerCase());
   }
 
   // por texto
   if (q) {
     out = out.filter(r =>
-      (r.DESCRIPCION || "").toLowerCase().includes(q) ||
-      String(r.PRODUCTO || "").toLowerCase().includes(q)
+      (r.Descripcion || "").toLowerCase().includes(q) ||
+      String(r.CodigoProd || "").toLowerCase().includes(q)
     );
   }
 
@@ -103,22 +103,20 @@ function applyFilters() {
 
 // Genera chips de categorías en #cats-wrap
 function buildCategories(items) {
-  const wrap = document.getElementById("cats-wrap");
-  if (!wrap) return;
+  const catsWrap = document.getElementById("cats-wrap");
+  if (!catsWrap) return;
 
-  const uniq = Array.from(new Set(items.map(r => r.CATEGORIA).filter(Boolean)))
-    .sort((a,b) => a.localeCompare(b, "es"));
+  const uniq = Array.from(
+    new Set(items.map(r => r.Categoria).filter(Boolean))
+  ).sort((a, b) => a.localeCompare(b, "es"));
 
-  wrap.innerHTML = [
+  catsWrap.innerHTML = [
     `<label class="chip"><input type="radio" name="cat" value="todas" checked> Todas</label>`,
     ...uniq.map(c => `<label class="chip"><input type="radio" name="cat" value="${c}"> ${c}</label>`)
   ].join("");
 
-  wrap.addEventListener("change", (e) => {
-    if (e.target?.name === "cat") {
-      state.cat = e.target.value;
-      applyFilters();
-    }
+  catsWrap.addEventListener("change", (e) => {
+    if (e.target.name === "cat") { state.cat = e.target.value; applyFilters(); }
   });
 }
 
