@@ -255,6 +255,9 @@ function sendOrderToSelectedSeller(){
 
   const url = `https://wa.me/${seller.phone}?text=${encodeURIComponent(msg)}`;
   location.href = url;
+
+ setTimeout(() => { Cart.clear(); }, 150);
+
   closeSellerModal();
 }
 
@@ -273,6 +276,9 @@ function sendOrderToSellerId(id){
   logSellerPickKPI(seller);
   const url = `https://wa.me/${seller.phone}?text=${encodeURIComponent(msg)}`;
   window.open(url, "_blank");
+
+   setTimeout(() => { Cart.clear(); }, 150);
+
   closeSellerModal();
 }
 
