@@ -179,11 +179,8 @@ const SELLERS = [
   { id: "v2", name: "Naza",  phone: "5493516645332" , photo: "img/vendedores/8.webp"  },
   { id: "v3", name: "Benjamín",  phone: "5493516645373" , photo: "img/vendedores/3.webp"},
   { id: "v4", name: "Mauro",  phone: "5493518747562" , photo: "img/vendedores/4.webp"},
-  { id: "v4", name: "Pablo",  phone: "5493512038696" , photo: "img/vendedores/5.webp"},
-  { id: "v4", name: "Franco",  phone: "5493518025934" , photo: "img/vendedores/6.webp"},
-
-
-  
+  { id: "v5", name: "Pablo",  phone: "5493512038696" , photo: "img/vendedores/5.webp"},
+  { id: "v6", name: "Franco",  phone: "5493518025934" , photo: "img/vendedores/6.webp"},
 ];
 
 
