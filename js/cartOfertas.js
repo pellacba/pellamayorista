@@ -284,15 +284,16 @@ function sendOrderToSellerId(id){
 
 const KPI_SELLER_URL = 'https://script.google.com/macros/s/AKfycbzk_VO0banLC9AAcGDI1ql7cQfvEPT6jxb-G59wZmBRb9hgdt3srtbeZslUNt4UgbOC/exec'; // <-- pega aquí tu URL
 
-
+// Lee métricas del carrito desde localStorage (usa tu misma clave del carrito)
 function getCartMetrics() {
   const KEY = (typeof CART_KEY === 'string' && CART_KEY) ? CART_KEY : 'cart_v1';
   try {
     const st = JSON.parse(localStorage.getItem(KEY)) || { items: [] };
     const items = Array.isArray(st.items) ? st.items : [];
-    const cart_skus  = items.length;                                     
+    const cart_skus  = items.length;                                       // cantidad de SKUs
+    const cart_units = items.reduce((a,i)=> a + Number(i.qty || 0), 0);    // suma de cantidades
     const cart_total = items.reduce((a,i)=> a + (Number(i.price || 0) * Number(i.qty || 0)), 0);
-
+    // redondeo a 2 decimales sin formatear (número “crudo”)
     const cart_total_num = Math.round(cart_total * 100) / 100;
     return { cart_skus, cart_units, cart_total: cart_total_num };
   } catch {
@@ -300,10 +301,12 @@ function getCartMetrics() {
   }
 }
 
-
+// Enviar KPI con vendedor + métricas del carrito
 function logSellerPickKPI(seller) {
   if (!seller) return;
+
   const { cart_skus, cart_units, cart_total } = getCartMetrics();
+
   const payload = {
     seller_id: seller.id || '',
     seller_name: seller.name || '',
@@ -312,11 +315,15 @@ function logSellerPickKPI(seller) {
     cart_total,
     source: location.pathname
   };
+
+  // 1) Preferí sendBeacon (no bloquea la navegación a WhatsApp y evita CORS visible)
   if (navigator.sendBeacon) {
     const blob = new Blob([JSON.stringify(payload)], { type: 'text/plain' });
     navigator.sendBeacon(KPI_SELLER_URL, blob);
     return;
   }
+
+  // 2) Fallback: request “simple” sin preflight (evita CORS)
   const body = new URLSearchParams({ payload: JSON.stringify(payload) }).toString();
   fetch(KPI_SELLER_URL, {
     method: 'POST',
@@ -325,4 +332,3 @@ function logSellerPickKPI(seller) {
     body
   }).catch(()=>{});
 }
-
