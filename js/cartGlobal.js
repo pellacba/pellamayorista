@@ -1,17 +1,19 @@
-// js/cart.js
-const CART_KEY = "cart_ofertas";
+// ===== Carrito global =====
+const CART_KEY = "cart_global";
+const MINIMO_PEDIDO = 30000; // si no querés mínimo, ponelo en 0
 
 const Cart = (() => {
   let state = { items: [] }; // { sku, name, price (num), qty, multiple }
 
-  // Normaliza/migra items guardados en localStorage para garantizar multiple/qty correctos
-  const migrateItems = (items) => {
+  // Migra/normaliza items guardados
+  const migrateItems = (items = []) => {
     let changed = false;
-    const out = (items || []).map(it => {
+    const out = items.map(it => {
       const multiple = Number(it.multiple) || 1;
-      const price = Number(it.price) || 0;
-      const qtyRaw = Number(it.qty) || 0;
-      const qty = Math.max(multiple, Math.ceil(qtyRaw / multiple) * multiple);
+      const price    = Number(it.price) || 0;
+      const qty0     = Number(it.qty) || 0;
+      // qty siempre múltiplo y al menos "multiple"
+      const qty      = Math.max(multiple, Math.ceil(qty0 / multiple) * multiple);
       if (it.multiple !== multiple || it.price !== price || it.qty !== qty) changed = true;
       return { ...it, multiple, price, qty };
     });
@@ -24,7 +26,7 @@ const Cart = (() => {
       if (!Array.isArray(state.items)) state.items = [];
       const { items, changed } = migrateItems(state.items);
       state.items = items;
-      if (changed) localStorage.setItem(CART_KEY, JSON.stringify(state)); // persistir migración
+      if (changed) localStorage.setItem(CART_KEY, JSON.stringify(state));
     } catch {
       state = { items: [] };
       localStorage.setItem(CART_KEY, JSON.stringify(state));
@@ -37,16 +39,24 @@ const Cart = (() => {
     renderBadge();
   };
 
-  // add ahora siempre respeta múltiplos
+  // add soporta:
+  // - múltiplos (multiple)
+  // - qty explícito (cigarrillosapi lo usa)
   const add = (item) => {
     const multiple = Number(item.multiple) || 1;
+    // si viene qty, la uso; si no, arranco en múltiplo
+    const qtyToAdd = Number(item.qty) || multiple;
+
     const i = state.items.findIndex(x => x.sku === item.sku);
     if (i >= 0) {
-      state.items[i].qty += multiple; // 🔹 suma de a múltiplos
+      state.items[i].qty += qtyToAdd;
+      // Ajusto a múltiplo por las dudas
+      const m = Number(state.items[i].multiple) || 1;
+      state.items[i].qty = Math.max(m, Math.ceil(state.items[i].qty / m) * m);
     } else {
       state.items.push({
         ...item,
-        qty: multiple,   // 🔹 arranca en múltiplo
+        qty: qtyToAdd,
         price: Number(item.price || 0),
         multiple
       });
@@ -64,7 +74,6 @@ const Cart = (() => {
     if (!it) return;
     const multiple = Number(it.multiple) || 1;
     const n = Number(qty) || 0;
-    // redondear hacia arriba al múltiplo más cercano y asegurar al menos "multiple"
     const rounded = Math.max(multiple, Math.ceil(n / multiple) * multiple);
     it.qty = rounded;
     save(); renderDrawer();
@@ -82,12 +91,11 @@ const Cart = (() => {
     if (el){
       el.textContent = count();
       el.classList.remove('bump');
-      void el.offsetWidth; // reflow para animación
+      void el.offsetWidth;
       el.classList.add('bump');
     }
   };
 
-  // Drawer UI
   const openDrawer = () => {
     const drawer = document.getElementById("cart-drawer");
     const backdrop = document.getElementById("cart-backdrop");
@@ -110,7 +118,7 @@ const Cart = (() => {
   };
 
   const renderDrawer = () => {
-    const wrap = document.getElementById("cart-items");
+    const wrap    = document.getElementById("cart-items");
     const totalEl = document.getElementById("cart-total");
     if (!wrap) return;
 
@@ -119,6 +127,8 @@ const Cart = (() => {
       if (totalEl) totalEl.textContent = "$0";
       const qtyEl = document.getElementById("total-qty");
       if (qtyEl) qtyEl.textContent = "0";
+      const countEl = document.getElementById("total-count");
+      if (countEl) countEl.textContent = "0";
       renderBadge();
       return;
     }
@@ -147,17 +157,17 @@ const Cart = (() => {
     `).join("");
 
     if (totalEl) totalEl.textContent = "$" + money(total());
-    const qtyEl = document.getElementById("total-qty");
+    const qtyEl   = document.getElementById("total-qty");
     if (qtyEl) qtyEl.textContent = distinct();
     const countEl = document.getElementById("total-count");
     if (countEl) countEl.textContent = count();
 
-    // Bind events qty/remove (respetando multiple)
+    // eventos de cantidad / remove
     wrap.querySelectorAll(".cart-item").forEach(row => {
       const sku = row.getAttribute("data-sku");
       const multiple = Number(row.getAttribute("data-multiple") || 1);
-
       const input = row.querySelector("input");
+
       row.querySelector(".inc")?.addEventListener("click", () => 
         setQty(sku, Number(input.value) + multiple)
       );
@@ -173,12 +183,10 @@ const Cart = (() => {
     renderBadge();
   };
 
-  // Expose public API
-  return { load, add, clear, openDrawer, closeDrawer, setQty, remove, distinct };
+  return { load, add, clear, openDrawer, closeDrawer, setQty, remove, distinct, total };
 })();
 
-const MINIMO_PEDIDO = 30000;
-
+// Helpers para mínimo y formato
 function cartTotal() {
   try {
     const st = JSON.parse(localStorage.getItem(CART_KEY) || '{"items":[]}');
@@ -188,27 +196,28 @@ function cartTotal() {
     return 0; 
   }
 }
-
 function fmt(n){
   return Number(n||0).toLocaleString('es-AR',{minimumFractionDigits:2,maximumFractionDigits:2});
 }
 
-
-// FAB & Drawer bindings
+// ===== DOM =====
 document.addEventListener("DOMContentLoaded", () => {
   Cart.load();
 
   document.getElementById("cart-fab")?.addEventListener("click", Cart.openDrawer);
   document.getElementById("cart-close")?.addEventListener("click", Cart.closeDrawer);
 
+  // botón de WhatsApp con mínimo de pedido
   document.getElementById("cart-whatsapp")?.addEventListener("click", (e) => {
   const total = cartTotal();
   if (total < MINIMO_PEDIDO) {
     e.preventDefault();
-    alert(`El mínimo de compra es $${fmt(MINIMO_PEDIDO)}.\nTu total actual es $${fmt(total)}.`);
-    return;                // NO abre el selector de vendedor
+    showToast(
+      `El mínimo de compra es $${fmt(MINIMO_PEDIDO)}.\nTu total actual es $${fmt(total)}.`
+    );
+    return;
   }
-  openSellerModal();       // Sólo si supera el mínimo
+  openSellerModal();
 });
 
   document.getElementById("seller-close")?.addEventListener("click", closeSellerModal);
@@ -222,26 +231,21 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-// API global mínima
+// API global común para ambos catálogos
 window.Carrito = {
-  add: ({name, sku, price, multiple}) =>
-    Cart.add({
-      name,
-      sku,
-      price: Number(price || 0),
-      multiple: Number(multiple || 1), // 🔹 respeta múltiplo
-      qty: Number(multiple || 1)       // 🔹 arranca en múltiplo
-    })
+  // ofertasapi manda {name, sku, price, multiple}
+  // cigarrillosapi manda {name, sku, price, qty}
+  add: (payload) => Cart.add(payload)
 };
 
-// Contactos disponibles (editá nombres y teléfonos)
+// ================= Vendedores =================
 const SELLERS = [
   { id: "v1", name: "Jhonatan",  phone: "5493516645324", photo: "img/vendedores/7.webp" },
-  { id: "v2", name: "Naza",  phone: "5493516645332" , photo: "img/vendedores/8.webp"  },
-  { id: "v3", name: "Benjamín",  phone: "5493516645373" , photo: "img/vendedores/3.webp"},
-  { id: "v4", name: "Mauro",  phone: "5493518747562" , photo: "img/vendedores/4.webp"},
-  { id: "v5", name: "Pablo",  phone: "5493512038696" , photo: "img/vendedores/5.webp"},
-  { id: "v6", name: "Franco",  phone: "5493518025934" , photo: "img/vendedores/6.webp"},
+  { id: "v2", name: "Naza",      phone: "5493516645332", photo: "img/vendedores/8.webp"  },
+  { id: "v3", name: "Benjamín",  phone: "5493516645373", photo: "img/vendedores/3.webp" },
+  { id: "v4", name: "Mauro",     phone: "5493518747562", photo: "img/vendedores/4.webp" },
+  { id: "v5", name: "Pablo",     phone: "5493512038696", photo: "img/vendedores/5.webp" },
+  { id: "v6", name: "Franco",    phone: "5493518025934", photo: "img/vendedores/6.webp" },
 ];
 
 function openSellerModal(){
@@ -268,57 +272,47 @@ function closeSellerModal(){
   document.getElementById("seller-modal")?.setAttribute("aria-hidden","true");
 }
 
-function sendOrderToSelectedSeller(){
-  const msg = buildOrderMessageNoPrices();
-  if (!msg){ alert("El carrito está vacío."); return; }
-
-  const seller = SELLERS.find(s => s.id === id);
-  if (!seller){ alert("Vendedor inválido."); return; }
-
-  // === KPI ===
-  logSellerPickKPI(seller);
-
-  const url = `https://wa.me/${seller.phone}?text=${encodeURIComponent(msg)}`;
-  location.href = url;
-
- setTimeout(() => { Cart.clear(); }, 150);
-
-  closeSellerModal();
-}
-
+// Mensaje sin precios (válido para cigarrillos; para ofertas también sirve)
 function buildOrderMessageNoPrices(){
   const items = JSON.parse(localStorage.getItem(CART_KEY) || '{"items":[]}').items || [];
   if (!items.length) return null;
-  const lines = items.map(it => `• ${it.name} , Cantidad: ${it.qty}, Precio: ${it.price}`);
-  return `¡Hola quiero hacer este pedido!:\n\n${lines.join("\n")}\n\n`;
+
+  const lines = items.map(it => `• ${it.name} , Cantidad: ${it.qty}`);
+  return `¡Hola! Quiero hacer este pedido:\n\n${lines.join("\n")}\n\n`;
+}
+
+function sendOrderToSelectedSeller(){
+  // Si más adelante querés un "seleccionado" desde un select, se puede mejorar.
+  alert("Elegí primero un vendedor de la lista 🙂");
 }
 
 function sendOrderToSellerId(id){
   const msg = buildOrderMessageNoPrices();
   if (!msg){ alert("El carrito está vacío."); return; }
+
   const seller = SELLERS.find(s => s.id === id);
   if (!seller){ alert("Vendedor inválido."); return; }
+
   logSellerPickKPI(seller);
+
   const url = `https://wa.me/${seller.phone}?text=${encodeURIComponent(msg)}`;
   window.open(url, "_blank");
 
-   setTimeout(() => { Cart.clear(); }, 150);
-
+  setTimeout(() => { Cart.clear(); }, 150);
   closeSellerModal();
 }
 
-const KPI_SELLER_URL = 'https://script.google.com/macros/s/AKfycbzk_VO0banLC9AAcGDI1ql7cQfvEPT6jxb-G59wZmBRb9hgdt3srtbeZslUNt4UgbOC/exec'; // <-- pega aquí tu URL
+// ================= KPI =================
+const KPI_SELLER_URL = 'https://script.google.com/macros/s/AKfycbzk_VO0banLC9AAcGDI1ql7cQfvEPT6jxb-G59wZmBRb9hgdt3srtbeZslUNt4UgbOC/exec';
 
-// Lee métricas del carrito desde localStorage (usa tu misma clave del carrito)
 function getCartMetrics() {
-  const KEY = (typeof CART_KEY === 'string' && CART_KEY) ? CART_KEY : 'cart_v1';
+  const KEY = CART_KEY;
   try {
     const st = JSON.parse(localStorage.getItem(KEY)) || { items: [] };
     const items = Array.isArray(st.items) ? st.items : [];
-    const cart_skus  = items.length;                                       // cantidad de SKUs
-    const cart_units = items.reduce((a,i)=> a + Number(i.qty || 0), 0);    // suma de cantidades
+    const cart_skus  = items.length;
+    const cart_units = items.reduce((a,i)=> a + Number(i.qty || 0), 0);
     const cart_total = items.reduce((a,i)=> a + (Number(i.price || 0) * Number(i.qty || 0)), 0);
-    // redondeo a 2 decimales sin formatear (número “crudo”)
     const cart_total_num = Math.round(cart_total * 100) / 100;
     return { cart_skus, cart_units, cart_total: cart_total_num };
   } catch {
@@ -326,7 +320,6 @@ function getCartMetrics() {
   }
 }
 
-// Enviar KPI con vendedor + métricas del carrito
 function logSellerPickKPI(seller) {
   if (!seller) return;
 
@@ -341,14 +334,12 @@ function logSellerPickKPI(seller) {
     source: location.pathname
   };
 
-  // 1) Preferí sendBeacon (no bloquea la navegación a WhatsApp y evita CORS visible)
   if (navigator.sendBeacon) {
     const blob = new Blob([JSON.stringify(payload)], { type: 'text/plain' });
     navigator.sendBeacon(KPI_SELLER_URL, blob);
     return;
   }
 
-  // 2) Fallback: request “simple” sin preflight (evita CORS)
   const body = new URLSearchParams({ payload: JSON.stringify(payload) }).toString();
   fetch(KPI_SELLER_URL, {
     method: 'POST',
@@ -356,4 +347,29 @@ function logSellerPickKPI(seller) {
     headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
     body
   }).catch(()=>{});
+}
+
+function showToast(message, duration = 3000) {
+  let toast = document.getElementById("cart-toast");
+
+  // si no existe, lo creo una vez
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.id = "cart-toast";
+    toast.className = "toast";
+    document.body.appendChild(toast);
+  }
+
+  toast.textContent = message;
+
+  // mostrar
+  requestAnimationFrame(() => {
+    toast.classList.add("show");
+  });
+
+  // ocultar después de X ms
+  clearTimeout(toast._hideTimer);
+  toast._hideTimer = setTimeout(() => {
+    toast.classList.remove("show");
+  }, duration);
 }

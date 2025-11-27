@@ -1,57 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" href="img/pellalogo.png" type="image/x-icon">
-    <link rel="stylesheet" href="styles/styles.css" />
-    <link rel="stylesheet" href="styles/cigarrillos.css">
-    <link rel="stylesheet" href="styles/stylesV2.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
-
-    <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-Z16QE92P3X"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-Z16QE92P3X');
-</script>
-
-    <title>Catalogo 2025</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="shortcut icon" href="img/pellalogo.png" type="image/x-icon">
+  <link rel="stylesheet" href="styles/styles.css" />
+  <link rel="stylesheet" href="styles/cigarrillos.css">
+  <link rel="stylesheet" href="styles/stylesV2.css">
+  <link rel="stylesheet" href="styles/onboarding.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <title>Catalogo 2025</title>
 </head>
 <body class="ofertas-page">
-<!-- Pantalla de transición -->
+  <!-- Pantalla de transición -->
   <div id="transition" class="transition-screen">
     <img src="img/pclogo.png" alt="Logo" class="transition-logo" />
   </div>
 
   <header class="page-header">
-      <a href="index.html" class="page-logo" aria-label="Volver a inicio">
-        <img src="img/pclogo.png" alt="Pella" />
-      </a>
+    <a href="index.html" class="page-logo" aria-label="Volver a inicio">
+      <img src="img/pclogo.png" alt="Pella" />
+    </a>
   </header>
 
   <section class="toolbar" aria-label="Herramientas de catálogo">
-  <div class="toolbar-row">
-    <input id="search-box" class="search-box" type="search" placeholder="buscador" aria-label="Buscar productos" autocomplete="off">
-    <button id="filters-btn" class="filters-btn" aria-haspopup="true" aria-expanded="false" aria-controls="filters-pop" title="Filtros">⋮</button>
-  </div>
-
-  <div id="filters-pop" class="filters-pop" hidden>
-    <div class="cat-group">
-      <span class="cat-title">Categorías</span>
-      <div id="cats-wrap" class="chips"></div>
+    <div class="toolbar-row">
+      <input id="search-box" class="search-box" type="search" placeholder="buscador" aria-label="Buscar productos" autocomplete="off">
+      <button id="filters-btn" class="filters-btn" aria-haspopup="true" aria-expanded="false" aria-controls="filters-pop" title="Filtros">⋮</button>
     </div>
-  </div>
-</section>
+    <div id="filters-pop" class="filters-pop" hidden>
+      <div class="cat-group">
+        <span class="cat-title">Categorías</span>
+        <div id="cats-wrap" class="chips"></div>
+      </div>
+    </div>
+  </section>
 
-<button id="search-fab" class="search-fab" aria-label="Abrir buscador" hidden>
-  <span class="ico">🔎</span>
-</button>
+  <button id="search-fab" class="search-fab" aria-label="Abrir buscador" hidden>
+    <span class="ico">🔎</span>
+  </button>
 
-<section id="catalogo" class="catalogo-grid"></section>
+  <section id="catalogo" class="catalogo-grid"></section>
 
   <!-- FAB carrito -->
   <button id="cart-fab" class="cart-fab" aria-label="Ver carrito">
@@ -60,68 +49,61 @@
   </button>
 
   <!-- Drawer carrito -->
-<aside id="cart-drawer" class="cart-drawer handfont" inert aria-hidden="true">
-  <header class="cart-header">
-    <i class="cart-ico left"></i>
-    <h2>Carrito</h2>
-    <i class="cart-ico right"></i>
-    <button id="cart-close" class="cart-close" aria-label="Cerrar">✕</button>
-  </header>
+  <aside id="cart-drawer" class="cart-drawer handfont" inert aria-hidden="true">
+    <header class="cart-header">
+      <i class="cart-ico left"></i>
+      <h2>Carrito</h2>
+      <i class="cart-ico right"></i>
+      <button id="cart-close" class="cart-close" aria-label="Cerrar">✕</button>
+    </header>
 
-  <!-- Encabezado de columnas -->
-  <div class="cart-cols">
-    <span>Productos</span>
-    <span>Cantidad</span>
-  </div>
-
-  <div id="cart-items" class="cart-items"></div>
-
-<footer class="cart-footer">
-  <div class="totals">
-    <div class="tot-line">
-      <span>Productos (SKUs)</span>
-      <strong id="total-qty">0</strong>
+    <div class="cart-cols">
+      <span>Productos</span>
+      <span>Cantidad</span>
     </div>
-    <div class="tot-line">
-      <span>Unidades</span>
-      <strong id="total-count">0</strong>
-    </div>
-    <div class="tot-line">
-      <span>Total</span>
-      <strong id="cart-total">$0,00</strong>
-    </div>
-  </div>
 
-  <button id="cart-whatsapp" class="wa-btn" type="button">
-    <span class="wa-ico"></span>
-    Enviar pedido
-  </button>
-</footer>
-</aside>
+    <div id="cart-items" class="cart-items"></div>
+
+    <footer class="cart-footer">
+      <div class="totals">
+        <div class="tot-line">
+          <span>Productos (SKUs)</span>
+          <strong id="total-qty">0</strong>
+        </div>
+        <div class="tot-line">
+          <span>Unidades</span>
+          <strong id="total-count">0</strong>
+        </div>
+        <div class="tot-line">
+          <span>Total</span>
+          <strong id="cart-total">$0,00</strong>
+        </div>
+      </div>
+
+      <button id="cart-whatsapp" class="wa-btn" type="button">
+        <span class="wa-ico"></span>
+        Enviar pedido
+      </button>
+    </footer>
+  </aside>
   <div id="cart-backdrop" class="cart-backdrop" aria-hidden="true"></div>
 
   <!-- JS -->
-  <script src="js/cartOfertas.js" defer></script>
-      <script type="module" src="js/ofertasapi.js"></script>
-  <script src="js/ofertas.js" defer></script>
+  <script src="js/cartGlobal.js" defer></script>
+  <script src="js/ofertasapi.js" defer></script>
 
   <!-- Modal Seleccionar Vendedor -->
-<div id="seller-backdrop" class="seller-backdrop" aria-hidden="true"></div>
-<div id="seller-modal" class="seller-modal" role="dialog" aria-modal="true" aria-labelledby="seller-title" aria-hidden="true">
-  <div class="seller-card">
-    <header class="seller-head">
-      <h3 id="seller-title">Seleccionar vendedor</h3>
-      <button id="seller-close" class="seller-close" aria-label="Cerrar">✕</button>
-    </header>
-
-    <div class="seller-body">
-      <!-- Se rellena por JS -->
-      <ul id="seller-list" class="seller-list"></ul>
+  <div id="seller-backdrop" class="seller-backdrop" aria-hidden="true"></div>
+  <div id="seller-modal" class="seller-modal" role="dialog" aria-modal="true" aria-labelledby="seller-title" aria-hidden="true">
+    <div class="seller-card">
+      <header class="seller-head">
+        <h3 id="seller-title">Seleccionar vendedor</h3>
+        <button id="seller-close" class="seller-close" aria-label="Cerrar">✕</button>
+      </header>
+      <div class="seller-body">
+        <ul id="seller-list" class="seller-list"></ul>
+      </div>
     </div>
-
-    
   </div>
-</div>
-
 </body>
 </html>
