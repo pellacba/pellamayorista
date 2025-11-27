@@ -84,11 +84,9 @@ function renderCigarCards(container, items) {
 
   container.querySelectorAll(".card-add").forEach(btn => {
     btn.addEventListener("click", () => {
-      const { sku, name } = btn.dataset;
-      const price = Number(btn.dataset.price || 0);
-      window.Carrito?.add({ name, sku, price, qty: 1 });
-      btn.classList.remove("added"); void btn.offsetWidth; btn.classList.add("added");
-      setTimeout(() => btn.classList.remove("added"), 550);
+    const { sku, name } = btn.dataset;
+    const price = Number(btn.dataset.price || 0);
+    window.Carrito?.add({ name, sku, price, qty: 1 });  // ✅ sigue siendo válido
     });
   });
 }
