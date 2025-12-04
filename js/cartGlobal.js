@@ -246,6 +246,7 @@ const SELLERS = [
   { id: "v4", name: "Mauro",     phone: "5493518747562", photo: "img/vendedores/4.webp" },
   { id: "v5", name: "Pablo",     phone: "5493512038696", photo: "img/vendedores/5.webp" },
   { id: "v6", name: "Franco",    phone: "5493518025934", photo: "img/vendedores/6.webp" },
+  { id: "v7", name: "Emiliano",    phone: "5493516645419", photo: "img/vendedores/9.webp" },
 ];
 
 function openSellerModal(){
