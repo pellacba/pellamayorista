@@ -278,7 +278,7 @@ function buildOrderMessageNoPrices(){
   const items = JSON.parse(localStorage.getItem(CART_KEY) || '{"items":[]}').items || [];
   if (!items.length) return null;
 
-  const lines = items.map(it => `• ${it.name} , Cantidad: ${it.qty}`);
+  const lines = items.map(it => `• ${it.name} , Cantidad: ${it.qty}, Precio: $${it.price}`);
   return `¡Hola! Quiero hacer este pedido:\n\n${lines.join("\n")}\n\n`;
 }
 
