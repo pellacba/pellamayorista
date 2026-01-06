@@ -75,9 +75,15 @@
       showToast("⚠️ Debés confirmar que sos mayor de 18 años.");
       return;
     }
+    // Fin de onboarding
     setOver18();
     root.remove();
-    if (infoBtn) infoBtn.style.display = "block"; // vuelve a aparecer el botón info
+    if (infoBtn) infoBtn.style.display = "block";
+
+    // 🔔 Notificá al resto de la app que el onboarding terminó
+    try {
+      window.dispatchEvent(new CustomEvent("onboarding:finished"));
+    } catch {}
   });
 
   root.classList.remove("hidden");
