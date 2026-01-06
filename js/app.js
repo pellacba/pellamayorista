@@ -1,10 +1,9 @@
+// ======================== Navegación botones ========================
 document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll(".btn").forEach((btn) => {
     btn.addEventListener("click", () => {
       const link = btn.getAttribute("data-link");
-      if (link) {
-        window.location.href = link;
-      }
+      if (link) window.location.href = link;
     });
   });
 });
@@ -14,9 +13,19 @@ function toggleWhatsappMenu() {
   menu.style.display = menu.style.display === "flex" ? "none" : "flex";
 }
 
+// ======================== Helpers popup ============================
 const POPUP_ID = "popup";
-const POPUP_KEY = "canal_popup_last_seen"; // para controlar frecuencia (localStorage)
-const POPUP_DAYS = 7; // mostrar solo 1 vez cada X días. Cambiá a 0 si querés mostrar SIEMPRE.
+const POPUP_KEY = "canal_popup_last_seen"; // frecuencia (localStorage)
+const POPUP_DAYS = 7; // 1 vez cada X días. Usa 0 para "siempre".
+
+function isOver18() {
+  try {
+    const v = localStorage.getItem("over18");
+    return v === "1" || v === "true";
+  } catch {
+    return false;
+  }
+}
 
 function abrirPopup() {
   const el = document.getElementById(POPUP_ID);
@@ -54,7 +63,7 @@ function debeMostrarPopup() {
   } catch { return true; }
 }
 
-// Cierre por clic fuera del contenido y por tecla ESC
+// Cierre por clic fuera del contenido
 document.addEventListener("click", (e) => {
   const overlay = document.getElementById(POPUP_ID);
   if (!overlay || !overlay.classList.contains("show")) return;
@@ -63,15 +72,33 @@ document.addEventListener("click", (e) => {
     cerrarPopup();
   }
 });
+
+// Cierre por tecla ESC
 document.addEventListener("keydown", (e) => {
   const overlay = document.getElementById(POPUP_ID);
   if (e.key === "Escape" && overlay?.classList.contains("show")) cerrarPopup();
 });
 
-// Lanzar al cargar index
-document.addEventListener("DOMContentLoaded", () => {
+// ======================== Orquestación (mostrar después del onboarding) ========================
+
+// Escuchamos un evento personalizado que dispara onboarding.js
+window.addEventListener("onboarding:finished", () => {
+  // Usuario primerizo: mostrar popup recién ahora
   if (debeMostrarPopup()) {
-    // pequeño delay para que no tape animaciones iniciales
-    setTimeout(abrirPopup, 600);
+    setTimeout(abrirPopup, 400); // leve delay para que se vea la transición
   }
 });
+
+// Al cargar la página:
+// - Si YA completó el onboarding (over18), aplicamos la regla de frecuencia y mostramos.
+// - Si NO lo completó, NO mostramos nada ahora; esperaremos el evento "onboarding:finished".
+document.addEventListener("DOMContentLoaded", () => {
+  if (isOver18()) {
+    if (debeMostrarPopup()) {
+      setTimeout(abrirPopup, 600);
+    }
+  }
+});
+
+// Exponé cerrarPopup si lo usás en el HTML (botón × o link)
+window.cerrarPopup = cerrarPopup;
