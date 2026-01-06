@@ -7,18 +7,18 @@ const Cart = (() => {
 
   // Migra/normaliza items guardados
   const migrateItems = (items = []) => {
-    let changed = false;
-    const out = items.map(it => {
-      const multiple = Number(it.multiple) || 1;
-      const price    = Number(it.price) || 0;
-      const qty0     = Number(it.qty) || 0;
-      // qty siempre múltiplo y al menos "multiple"
-      const qty      = Math.max(multiple, Math.ceil(qty0 / multiple) * multiple);
-      if (it.multiple !== multiple || it.price !== price || it.qty !== qty) changed = true;
-      return { ...it, multiple, price, qty };
-    });
-    return { items: out, changed };
-  };
+  let changed = false;
+  const out = items.map(it => {
+    const multiple = Number(it.multiple) || 1;
+    const price    = Number(it.price)    || 0;
+    const qty0     = Number(it.qty)      || 0;
+    const discount = Number(it.discount) || 0;   // ← NUEVO
+    const qty      = Math.max(multiple, Math.ceil(qty0 / multiple) * multiple);
+    if (it.multiple !== multiple || it.price !== price || it.qty !== qty || (it.discount||0) !== discount) changed = true;
+    return { ...it, multiple, price, qty, discount }; // ← NUEVO
+  });
+  return { items: out, changed };
+};
 
   const load = () => {
     try {
@@ -56,9 +56,10 @@ const Cart = (() => {
     } else {
       state.items.push({
         ...item,
-        qty: qtyToAdd,
+        qty: Number(item.qty) || multiple,
         price: Number(item.price || 0),
-        multiple
+        multiple,
+        discount: Number(item.discount || 0)   // ← NUEVO
       });
     }
     save(); renderDrawer();
@@ -117,26 +118,31 @@ const Cart = (() => {
     document.getElementById("cart-fab")?.focus();
   };
 
-  const renderDrawer = () => {
-    const wrap    = document.getElementById("cart-items");
-    const totalEl = document.getElementById("cart-total");
-    if (!wrap) return;
+const renderDrawer = () => {
+  const wrap    = document.getElementById("cart-items");
+  const totalEl = document.getElementById("cart-total");
+  if (!wrap) return;
 
-    if (state.items.length === 0){
-      wrap.innerHTML = `<p class="lead" style="color:#9ca3af">Tu carrito está vacío.</p>`;
-      if (totalEl) totalEl.textContent = "$0";
-      const qtyEl = document.getElementById("total-qty");
-      if (qtyEl) qtyEl.textContent = "0";
-      const countEl = document.getElementById("total-count");
-      if (countEl) countEl.textContent = "0";
-      renderBadge();
-      return;
-    }
+  if (state.items.length === 0){
+    wrap.innerHTML = `<p class="lead" style="color:#9ca3af">Tu carrito está vacío.</p>`;
+    if (totalEl) totalEl.textContent = "$0";
+    const qtyEl = document.getElementById("total-qty");
+    if (qtyEl) qtyEl.textContent = "0";
+    const countEl = document.getElementById("total-count");
+    if (countEl) countEl.textContent = "0";
+    renderBadge();
+    return;
+  }
 
-    wrap.innerHTML = state.items.map(i => `
-      <div class="cart-item" data-sku="${i.sku}" data-multiple="${i.multiple || 1}">
+  wrap.innerHTML = state.items.map(i => {
+    const off = Number(i.discount || 0);
+    const offTag = off > 0 ? `<span class="off-pill">-${off}%</span>` : "";
+    const itemCls = off > 0 ? "cart-item has-off" : "cart-item";
+
+    return `
+      <div class="${itemCls}" data-sku="${i.sku}" data-multiple="${i.multiple || 1}">
         <div class="info">
-          <h4>${i.name}</h4>
+          <h4>${i.name} ${offTag}</h4>
           <div class="meta">
             <span class="unit">Unit: $${money(i.price)}</span>
             <span class="sub">Subt: $${money(i.price * i.qty)}</span>
@@ -154,34 +160,35 @@ const Cart = (() => {
           <button class="remove">Eliminar</button>
         </div>
       </div>
-    `).join("");
+    `;
+  }).join("");
 
-    if (totalEl) totalEl.textContent = "$" + money(total());
-    const qtyEl   = document.getElementById("total-qty");
-    if (qtyEl) qtyEl.textContent = distinct();
-    const countEl = document.getElementById("total-count");
-    if (countEl) countEl.textContent = count();
+  if (totalEl) totalEl.textContent = "$" + money(total());
+  const qtyEl   = document.getElementById("total-qty");
+  if (qtyEl) qtyEl.textContent = distinct();
+  const countEl = document.getElementById("total-count");
+  if (countEl) countEl.textContent = count();
 
-    // eventos de cantidad / remove
-    wrap.querySelectorAll(".cart-item").forEach(row => {
-      const sku = row.getAttribute("data-sku");
-      const multiple = Number(row.getAttribute("data-multiple") || 1);
-      const input = row.querySelector("input");
+  // eventos de cantidad / remove
+  wrap.querySelectorAll(".cart-item").forEach(row => {
+    const sku = row.getAttribute("data-sku");
+    const multiple = Number(row.getAttribute("data-multiple") || 1);
+    const input = row.querySelector("input");
 
-      row.querySelector(".inc")?.addEventListener("click", () => 
-        setQty(sku, Number(input.value) + multiple)
-      );
-      row.querySelector(".dec")?.addEventListener("click", () => 
-        setQty(sku, Number(input.value) - multiple)
-      );
-      input?.addEventListener("change", e => 
-        setQty(sku, Number(e.target.value))
-      );
-      row.querySelector(".remove")?.addEventListener("click", () => remove(sku));
-    });
+    row.querySelector(".inc")?.addEventListener("click", () =>
+      setQty(sku, Number(input.value) + multiple)
+    );
+    row.querySelector(".dec")?.addEventListener("click", () =>
+      setQty(sku, Number(input.value) - multiple)
+    );
+    input?.addEventListener("change", e =>
+      setQty(sku, Number(e.target.value))
+    );
+    row.querySelector(".remove")?.addEventListener("click", () => remove(sku));
+  });
 
-    renderBadge();
-  };
+  renderBadge();
+};
 
   return { load, add, clear, openDrawer, closeDrawer, setQty, remove, distinct, total };
 })();
@@ -246,7 +253,7 @@ const SELLERS = [
   { id: "v4", name: "Mauro",     phone: "5493518747562", photo: "img/vendedores/4.webp" },
   { id: "v5", name: "Pablo",     phone: "5493512038696", photo: "img/vendedores/5.webp" },
   { id: "v6", name: "Franco",    phone: "5493518025934", photo: "img/vendedores/6.webp" },
-  { id: "v7", name: "Emiliano",    phone: "5493516645419", photo: "img/vendedores/9.webp" },
+  { id: "v7", name: "Emiliano",    phone: "5493516645419", photo: "img/vendedores/9.webp" }
 ];
 
 function openSellerModal(){
@@ -278,7 +285,7 @@ function buildOrderMessageNoPrices(){
   const items = JSON.parse(localStorage.getItem(CART_KEY) || '{"items":[]}').items || [];
   if (!items.length) return null;
 
-  const lines = items.map(it => `• ${it.name} , Cantidad: ${it.qty}, Precio: $${it.price}`);
+  const lines = items.map(it => `• ${it.name} , Cantidad: ${it.qty}, Precio: $${it.price}, Descuento: ${it.discount}%`);
   return `¡Hola! Quiero hacer este pedido:\n\n${lines.join("\n")}\n\n`;
 }
 

@@ -462,6 +462,7 @@ body {
   border: 1px solid var(--cart-bord);
   border-radius: 14px;
 }
+
 .cart-item h4 {
   margin: 0;
   font: 700 clamp(14px, 3.2vw, 16px) / 1.25 "Poppins", system-ui;
@@ -470,6 +471,27 @@ body {
 }
 .cart-item small {
   display: none;
+}
+
+.cart-item.has-off{
+  border: 1px solid #a855f7;                /* violeta */
+  box-shadow: 0 0 0 2px rgba(168,85,247,.22);
+  background:
+    linear-gradient(180deg, rgba(168,85,247,.08), transparent) /* leve glow */,
+    var(--cart-card);
+}
+
+/* Pill -% junto al nombre */
+.off-pill{
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 8px;
+  font: 800 12px/1 "Poppins", system-ui;
+  color: #fff;
+  background: linear-gradient(135deg,#7c3aed,#a855f7);
+  border-radius: 999px;
+  vertical-align: middle;
+  letter-spacing: .2px;
 }
 
 /* Controles cantidad */

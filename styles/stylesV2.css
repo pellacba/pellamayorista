@@ -55,6 +55,7 @@ body.ofertas-page{
   width: 100%;
   height: 100%;
   overflow: hidden;
+  position: relative;
 }
 
 .card-img{
@@ -209,26 +210,50 @@ body.ofertas-page{
 /* Card destacada */
 .card.destacado {
   border: 2px solid #a855f7; /* violeta */
-  box-shadow: 0 0 20px rgba(168, 85, 247, 0.8),
-              0 0 40px rgba(168, 85, 247, 0.6);
+  box-shadow: 0 0 10px rgba(168, 85, 247, 0.8),
+              0 0 0px rgba(168, 85, 247, 0.6);
   animation: fuego 1.5s infinite alternate;
   position: relative;
 }
 
-/* Efecto de resplandor */
-@keyframes fuego {
-  0% {
-    box-shadow: 0 0 15px rgba(168, 85, 247, 0.6),
-                0 0 30px rgba(168, 85, 247, 0.4);
-    transform: scale(1);
-  }
-  100% {
-    box-shadow: 0 0 30px rgba(168, 85, 247, 1),
-                0 0 60px rgba(168, 85, 247, 0.9);
-    transform: scale(1.03);
-  }
+
+/* Cinta de descuento (esquina superior izquierda) */
+.discount-ribbon{
+  position:absolute;
+  top:0; left:0;
+  width:78px;            /* tamaño del triángulo */
+  height:78px;
+  z-index:5;
+  pointer-events:none;   /* no tapa clicks del botón Agregar */
 }
 
+/* Triángulo relleno con degradé */
+.discount-ribbon::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background: linear-gradient(135deg, #7c3aed, #a855f7);
+  clip-path: polygon(0 0, 100% 0, 0 100%); /* triángulo perfecto */
+}
+
+/* Texto rotado sobre la cinta */
+.discount-ribbon > span{
+  position:absolute;
+  top: 25px; left:6px;
+  transform: rotate(-45deg);
+  transform-origin: left top;
+  color:#fff;
+  font-weight:800;
+  font-size: 18px;
+  letter-spacing:.3px;
+  text-shadow:0 1px 2px rgba(0,0,0,.35);
+}
+
+/* Ajuste responsive */
+@media (max-width:480px){
+  .discount-ribbon{ width:64px; height:64px; }
+  .discount-ribbon > span{ top:20px; left:7px; font-size:14px; }
+}
 /* ===== Toolbar (buscador + filtros) ===== */
 .toolbar{
   position: sticky;
@@ -331,4 +356,11 @@ body.ofertas-page{
   .search-fab{ left: 10px; top: calc(var(--header-h) + 8px); }
 }
 
+.card-oldprice{
+  margin-top: 6px;
+  color: rgba(10,15,28,.6);
+  font-weight: 700;
+  font-size: 13px;
+  text-decoration: line-through;
+}
 
