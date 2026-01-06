@@ -266,3 +266,50 @@ body {
   font-family: 'Poppins',sans-serif;
 }
 
+/* ===== POPUP CANAL ===== */
+.popup-overlay {
+  position: fixed;
+  inset: 0;
+  display: none;                 /* se activa con .show */
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,.7);
+  z-index: 10000;                /* por encima de todo */
+}
+
+.popup-overlay.show { display: flex; }
+
+.popup-content {
+  position: relative;
+  background: transparent;
+  border-radius: 12px;
+  padding: 0;
+  max-width: min(90vw, 460px);
+  max-height: 90vh;
+  animation: fadeIn .25s ease;
+}
+
+.popup-content img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.4);
+}
+
+.popup-close {
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  width: 32px; height: 32px;
+  border: 0;
+  border-radius: 50%;
+  background: #fff;
+  color: #333;
+  font: 700 20px/32px Poppins, system-ui;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,.3);
+}
+.popup-close:hover { background: #f33131; color: #fff; }
+
+@keyframes fadeIn { from {opacity:0; transform:scale(.98)} to {opacity:1; transform:scale(1)} }
