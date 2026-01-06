@@ -14,8 +14,8 @@ async function fetchOfertas() {
   // Alias de columna: si en la BD se llama "Categoria", llega como CATEGORIA en el JSON
   const url =
     `${SUPABASE_URL}/rest/v1/${TABLE}`
-    + `?select=CodigoProd,Descripcion,PrecioFinal,Proveedor,Categoria,Multiplos, ORDEN`
-    + `&order=ORDEN.asc, Proveedor`;
+    + `?select=CodigoProd,Descripcion,PrecioFinal,Proveedor,Categoria,Multiplos, ORDEN, Descuento`
+    + `&order=Descuento, ORDEN.asc, Proveedor`;
 
   const res = await fetch(url, {
     headers: { apikey: SUPABASE_ANON, Authorization: `Bearer ${SUPABASE_ANON}` },
@@ -40,27 +40,52 @@ function renderCards(container, items) {
   if (!container) return;
   if (!Array.isArray(items)) items = [];
 
+  const money = n => Number(n || 0).toLocaleString("es-AR", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
+
   container.innerHTML = items.map(row => {
     const sku      = row.CodigoProd;
     const name     = row.Descripcion;
-    const price    = Number(row.PrecioFinal || 0);
-    const multiple = Number(row.Multiplos || 1);
+    const base     = Number(row.PrecioFinal || 0);               // precio base BD
     const path     = row.IMG_PATH || sku;
     const src      = imgUrl(path);
 
+    // descuento: puede venir como 15 o "15%"
+    const descRaw  = row.Descuento ?? 0;
+    const descNum  = Number(String(descRaw).replace('%','')) || 0;
+
+    // precio con descuento
+    const priceEff = Math.round(base * (1 - descNum/100) * 100) / 100;
+
+    // destacado por defecto si hay descuento
+    const isDestacado = descNum > 0;
+    const ribbon = descNum > 0
+      ? `<div class="discount-ribbon" aria-label="Descuento ${descNum}%"><span>${descNum}%</span></div>`
+      : "";
+
+    // precio anterior (tachado) solo si hay descuento
+    const oldPrice = descNum > 0
+      ? `<div class="card-oldprice">$${money(base)}</div>`
+      : "";
+
     return `
-      <article class="card ${row.DESTACADO ? "destacado" : ""}">
+      <article class="card ${isDestacado ? "destacado" : ""}">
+        ${ribbon}
         <div class="card-img">
           <img src="${src}" alt="${name}" loading="lazy" decoding="async">
         </div>
         <h3 class="card-title">${name}</h3>
-        <div class="card-price">$${money(price)}</div>
+        ${oldPrice}
+        <div class="card-price">$${money(priceEff)}</div>
         <button class="card-add"
                 type="button"
                 data-sku="${sku}"
                 data-name="${name}"
-                data-price="${price}"
-                data-multiple="${multiple}">
+                data-price="${priceEff}"         /* <- al carrito va con descuento */
+                data-discount="${descNum}"       /* <- guardo % para destacar en carrito */
+                data-multiple="${Number(row.Multiplos || 1)}">
           Agregar
         </button>
       </article>
@@ -71,9 +96,12 @@ function renderCards(container, items) {
   container.querySelectorAll(".card-add").forEach(btn => {
     btn.addEventListener("click", () => {
       const { sku, name } = btn.dataset;
-      const price    = Number(btn.dataset.price);
-      const multiple = Number(btn.dataset.multiple) || 1;
-      window.Carrito?.add({ name, sku, price, multiple });
+      const price     = Number(btn.dataset.price) || 0;      // ya descontado
+      const multiple  = Number(btn.dataset.multiple) || 1;
+      const discount  = Number(btn.dataset.discount) || 0;
+
+      // Tu API global del carrito
+      window.Carrito?.add({ name, sku, price, multiple, discount });
     });
   });
 }
