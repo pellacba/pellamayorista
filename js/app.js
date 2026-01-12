@@ -16,7 +16,7 @@ function toggleWhatsappMenu() {
 // ======================== Helpers popup ============================
 const POPUP_ID = "popup";
 const POPUP_KEY = "canal_popup_last_seen"; // frecuencia (localStorage)
-const POPUP_DAYS = 7; // 1 vez cada X días. Usa 0 para "siempre".
+const POPUP_DAYS = 0; // 1 vez cada X días. Usa 0 para "siempre".
 
 function isOver18() {
   try {
