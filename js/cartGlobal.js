@@ -247,14 +247,14 @@ window.Carrito = {
 
 // ================= Vendedores =================
 const SELLERS = [
-  { id: "v1", name: "Jhonatan",  phone: "5493516645324", photo: "img/vendedores/7.webp" },
-  { id: "v2", name: "Marcos",  phone: "5493516645332" , photo: "img/vendedores/10.webp"  },
-  { id: "v3", name: "Benjamín",  phone: "5493516645373", photo: "img/vendedores/3.webp" },
-  { id: "v4", name: "Mauro",     phone: "5493518747562", photo: "img/vendedores/4.webp" },
-  { id: "v5", name: "Pablo",     phone: "5493512038696", photo: "img/vendedores/5.webp" },
-  { id: "v6", name: "Franco",    phone: "5493518025934", photo: "img/vendedores/6.webp" },
-  { id: "v7", name: "Emiliano",    phone: "5493516645419", photo: "img/vendedores/9.webp" },
-  { id: "v8", name: "Dario",  phone: "5493516645322" , photo: "img/vendedores/11.webp"},
+  { id: "v1", name: "Jhonatan",  phone: "5493516645324", photo: "img/vendedores/7.webp", zona: "Punilla" },
+  { id: "v2", name: "Marcos",  phone: "5493516645332" , photo: "img/vendedores/10.webp", zona: "Villa María"},
+  { id: "v4", name: "Mauro",     phone: "5493518747562", photo: "img/vendedores/4.webp", zona: "San Francisco" },
+  { id: "v5", name: "Pablo",     phone: "5493512038696", photo: "img/vendedores/5.webp", zona: "San Francisco" },
+  { id: "v8", name: "Dario",  phone: "5493516645322" , photo: "img/vendedores/11.webp", zona: "Rio Tercero"},
+  { id: "v6", name: "Franco",    phone: "5493518025934", photo: "img/vendedores/6.webp", zona: "Rafaela"},
+  { id: "v7", name: "Emiliano",    phone: "5493516645419", photo: "img/vendedores/9.webp", zona: "Rio Cuarto"},
+  { id: "v3", name: "Benjamín",  phone: "5493516645373", photo: "img/vendedores/3.webp" , zona: "Rio Cuarto"},
 ];
 
 function openSellerModal(){
@@ -263,7 +263,7 @@ function openSellerModal(){
     list.innerHTML = SELLERS.map(s => `
       <li class="seller-item">
         <button type="button" class="seller-pick" data-id="${s.id}">
-          <div class="seller-name">${s.name}</div>
+          <div class="seller-name">${s.name} - ${s.zona}</div>
           <img src="${s.photo}" alt="${s.name}" class="seller-photo" />
         </button>
       </li>
