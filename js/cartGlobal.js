@@ -254,7 +254,7 @@ const SELLERS = [
   { id: "v8", name: "Dario",  phone: "5493516645322" , photo: "img/vendedores/11.webp", zona: "Rio Tercero"},
   { id: "v6", name: "Franco",    phone: "5493518025934", photo: "img/vendedores/6.webp", zona: "Rafaela"},
   { id: "v7", name: "Emiliano",    phone: "5493516645419", photo: "img/vendedores/9.webp", zona: "Rio Cuarto"},
-  { id: "v3", name: "Pablo",  phone: "5493516645373", photo: "img/vendedores/12.jpg" , zona: "Rio Cuarto"},
+  { id: "v3", name: "Pablo",  phone: "5493516645373", photo: "img/vendedores/12.webp" , zona: "Rio Cuarto"},
 ];
 
 function openSellerModal(){
