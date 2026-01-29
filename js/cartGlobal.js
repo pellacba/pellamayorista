@@ -312,7 +312,7 @@ function sendOrderToSellerId(id){
 }
 
 // ================= KPI =================
-const KPI_SELLER_URL = 'https://script.google.com/macros/s/AKfycbzk_VO0banLC9AAcGDI1ql7cQfvEPT6jxb-G59wZmBRb9hgdt3srtbeZslUNt4UgbOC/exec';
+const KPI_SELLER_URL = 'https://script.google.com/macros/s/AKfycbyWtQ1EyiNozegxE1W-PlXbUqpkWzuEFHyNp9IBBZ-RqSPiv4PqI38lGmwTPrWyMBx5/exec';
 
 function getCartMetrics() {
   const KEY = CART_KEY;
@@ -329,10 +329,26 @@ function getCartMetrics() {
   }
 }
 
+function getCartItems() {
+  try {
+    const st = JSON.parse(localStorage.getItem(CART_KEY)) || { items: [] };
+    return (st.items || []).map(i => ({
+      sku: i.sku,
+      name: i.name,
+      price: i.price,
+      qty: i.qty,
+      discount: i.discount || 0
+    }));
+  } catch {
+    return [];
+  }
+}
+
 function logSellerPickKPI(seller) {
   if (!seller) return;
 
   const { cart_skus, cart_units, cart_total } = getCartMetrics();
+  const order_id = Date.now();
 
   const payload = {
     seller_id: seller.id || '',
@@ -340,7 +356,9 @@ function logSellerPickKPI(seller) {
     cart_skus,
     cart_units,
     cart_total,
-    source: location.pathname
+    source: location.pathname,
+    order_id,
+    items: JSON.stringify(getCartItems())
   };
 
   if (navigator.sendBeacon) {
