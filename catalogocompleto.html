@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <link rel="shortcut icon" href="img/pellalogo.png" type="image/x-icon">
   <link rel="stylesheet" href="styles/styles.css" />
-  <link rel="stylesheet" href="styles/cigarrillos.css">
-  <link rel="stylesheet" href="styles/stylesV2.css">
   <link rel="stylesheet" href="styles/onboarding.css">
+  <link rel="stylesheet" href="styles/cigarrillos.css">
+  <link rel="stylesheet" href="styles/stylesV2.css"> <!-- ← AL FINAL -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
   <title>Catalogo 2025</title>
 </head>
@@ -107,3 +107,23 @@
   </div>
 </body>
 </html>
+
+<!-- Modal Seleccionar Productos del Combo -->
+<div id="combo-selector-backdrop" class="seller-backdrop" aria-hidden="true"></div>
+<div id="combo-selector-modal" class="seller-modal" role="dialog" aria-modal="true" aria-labelledby="combo-selector-title" aria-hidden="true">
+  <div class="seller-card">
+    <header class="seller-head">
+      <h3 id="combo-selector-title">Selecciona tus productos</h3>
+      <button id="combo-selector-close" class="seller-close" aria-label="Cerrar">✕</button>
+    </header>
+    <div class="seller-body">
+      <p id="combo-selector-subtitle" style="margin-bottom: 15px; color: #666; font-size: 14px;"></p>
+      <div id="combo-options-list"></div>
+    </div>
+    <footer style="padding: 15px; border-top: 1px solid #eee;">
+      <button id="combo-confirm-btn" class="btn" style="width: 100%; background: #fbbf24; color: #0a0f1c;">
+        Agregar al carrito
+      </button>
+    </footer>
+  </div>
+</div>
