@@ -12,10 +12,10 @@ const Cart = (() => {
     const multiple = Number(it.multiple) || 1;
     const price    = Number(it.price)    || 0;
     const qty0     = Number(it.qty)      || 0;
-    const discount = Number(it.discount) || 0;   // ← NUEVO
+    const discount = Number(it.discount) || 0;
     const qty      = Math.max(multiple, Math.ceil(qty0 / multiple) * multiple);
     if (it.multiple !== multiple || it.price !== price || it.qty !== qty || (it.discount||0) !== discount) changed = true;
-    return { ...it, multiple, price, qty, discount }; // ← NUEVO
+    return { ...it, multiple, price, qty, discount };
   });
   return { items: out, changed };
 };
@@ -39,18 +39,13 @@ const Cart = (() => {
     renderBadge();
   };
 
-  // add soporta:
-  // - múltiplos (multiple)
-  // - qty explícito (cigarrillosapi lo usa)
   const add = (item) => {
     const multiple = Number(item.multiple) || 1;
-    // si viene qty, la uso; si no, arranco en múltiplo
     const qtyToAdd = Number(item.qty) || multiple;
 
     const i = state.items.findIndex(x => x.sku === item.sku);
     if (i >= 0) {
       state.items[i].qty += qtyToAdd;
-      // Ajusto a múltiplo por las dudas
       const m = Number(state.items[i].multiple) || 1;
       state.items[i].qty = Math.max(m, Math.ceil(state.items[i].qty / m) * m);
     } else {
@@ -59,7 +54,7 @@ const Cart = (() => {
         qty: Number(item.qty) || multiple,
         price: Number(item.price || 0),
         multiple,
-        discount: Number(item.discount || 0)   // ← NUEVO
+        discount: Number(item.discount || 0)
       });
     }
     save(); renderDrawer();
@@ -138,6 +133,29 @@ const renderDrawer = () => {
     const off = Number(i.discount || 0);
     const offTag = off > 0 ? `<span class="off-pill">-${off}%</span>` : "";
     const itemCls = off > 0 ? "cart-item has-off" : "cart-item";
+    
+    // Detectar si es un combo (el sku contiene guión y timestamp)
+    const isCombo = false; // Ya no bloqueamos controles para combos
+    
+    // Si es combo, solo mostrar botón eliminar
+    const controlsHTML = isCombo ? `
+      <div class="controls">
+        <div class="qty-fixed" style="font-weight: 700; color: #0a0f1c;">Cant: ${i.qty}</div>
+        <button class="remove">Eliminar</button>
+      </div>
+    ` : `
+      <div class="controls">
+        <div class="qty">
+          <button class="dec" aria-label="Menos">−</button>
+          <input type="number" 
+                 min="${i.multiple || 1}" 
+                 step="${i.multiple || 1}" 
+                 value="${i.qty}" />
+          <button class="inc" aria-label="Más">+</button>
+        </div>
+        <button class="remove">Eliminar</button>
+      </div>
+    `;
 
     return `
       <div class="${itemCls}" data-sku="${i.sku}" data-multiple="${i.multiple || 1}">
@@ -148,17 +166,7 @@ const renderDrawer = () => {
             <span class="sub">Subt: $${money(i.price * i.qty)}</span>
           </div>
         </div>
-        <div class="controls">
-          <div class="qty">
-            <button class="dec" aria-label="Menos">−</button>
-            <input type="number" 
-                   min="${i.multiple || 1}" 
-                   step="${i.multiple || 1}" 
-                   value="${i.qty}" />
-            <button class="inc" aria-label="Más">+</button>
-          </div>
-          <button class="remove">Eliminar</button>
-        </div>
+        ${controlsHTML}
       </div>
     `;
   }).join("");
@@ -169,23 +177,41 @@ const renderDrawer = () => {
   const countEl = document.getElementById("total-count");
   if (countEl) countEl.textContent = count();
 
-  // eventos de cantidad / remove
-  wrap.querySelectorAll(".cart-item").forEach(row => {
-    const sku = row.getAttribute("data-sku");
-    const multiple = Number(row.getAttribute("data-multiple") || 1);
-    const input = row.querySelector("input");
+  // eventos de cantidad / remove - CORREGIDO
+// eventos de cantidad / remove - CORREGIDO
+wrap.querySelectorAll(".cart-item").forEach(row => {
+  const skuRaw = row.getAttribute("data-sku");
+  const sku = isNaN(skuRaw) ? skuRaw : Number(skuRaw); // ← CONVIERTE A NÚMERO SI ES NUMÉRICO
+  const multiple = Number(row.getAttribute("data-multiple") || 1);
+  const input = row.querySelector("input[type='number']");
+  const incBtn = row.querySelector(".inc");
+  const decBtn = row.querySelector(".dec");
+  const removeBtn = row.querySelector(".remove");
 
-    row.querySelector(".inc")?.addEventListener("click", () =>
-      setQty(sku, Number(input.value) + multiple)
-    );
-    row.querySelector(".dec")?.addEventListener("click", () =>
-      setQty(sku, Number(input.value) - multiple)
-    );
-    input?.addEventListener("change", e =>
-      setQty(sku, Number(e.target.value))
-    );
-    row.querySelector(".remove")?.addEventListener("click", () => remove(sku));
-  });
+  if (incBtn) {
+    incBtn.addEventListener("click", () => {
+      setQty(sku, Number(input.value) + multiple);
+    });
+  }
+
+  if (decBtn) {
+    decBtn.addEventListener("click", () => {
+      setQty(sku, Number(input.value) - multiple);
+    });
+  }
+
+  if (input) {
+    input.addEventListener("change", (e) => {
+      setQty(sku, Number(e.target.value));
+    });
+  }
+
+  if (removeBtn) {
+    removeBtn.addEventListener("click", () => {
+      remove(sku);
+    });
+  }
+});
 
   renderBadge();
 };
@@ -214,7 +240,6 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("cart-fab")?.addEventListener("click", Cart.openDrawer);
   document.getElementById("cart-close")?.addEventListener("click", Cart.closeDrawer);
 
-  // botón de WhatsApp con mínimo de pedido
   document.getElementById("cart-whatsapp")?.addEventListener("click", (e) => {
   const total = cartTotal();
   if (total < MINIMO_PEDIDO) {
@@ -240,8 +265,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // API global común para ambos catálogos
 window.Carrito = {
-  // ofertasapi manda {name, sku, price, multiple}
-  // cigarrillosapi manda {name, sku, price, qty}
   add: (payload) => Cart.add(payload)
 };
 
@@ -281,26 +304,34 @@ function closeSellerModal(){
   document.getElementById("seller-modal")?.setAttribute("aria-hidden","true");
 }
 
-// Mensaje sin precios (válido para cigarrillos; para ofertas también sirve)
 function buildOrderMessageNoPrices(){
   const items = JSON.parse(localStorage.getItem(CART_KEY) || '{"items":[]}').items || [];
   if (!items.length) return null;
 
-  const lines = items.map(it => `• ${it.name} , Cantidad: ${it.qty}, Precio: $${it.price}, Descuento: ${it.discount}%`);
+  const lines = items.map(it => {
+    const discount = Number(it.discount) || 0;
+    const discountText = discount > 0 ? `, Descuento: ${discount}%` : '';
+    return `• ${it.name} , Cantidad: ${it.qty}, Precio: $${it.price}${discountText}`;
+  });
   return `¡Hola! Quiero hacer este pedido:\n\n${lines.join("\n")}\n\n`;
 }
 
 function sendOrderToSelectedSeller(){
-  // Si más adelante querés un "seleccionado" desde un select, se puede mejorar.
-  alert("Elegí primero un vendedor de la lista 🙂");
+  showToast("Elegí primero un vendedor de la lista 🙂", 2500);
 }
 
 function sendOrderToSellerId(id){
   const msg = buildOrderMessageNoPrices();
-  if (!msg){ alert("El carrito está vacío."); return; }
+  if (!msg){ 
+    showToast("El carrito está vacío", 2500);
+    return; 
+  }
 
   const seller = SELLERS.find(s => s.id === id);
-  if (!seller){ alert("Vendedor inválido."); return; }
+  if (!seller){ 
+    showToast("Vendedor inválido", 2500);
+    return; 
+  }
 
   logSellerPickKPI(seller);
 
@@ -310,7 +341,6 @@ function sendOrderToSellerId(id){
   setTimeout(() => { Cart.clear(); }, 150);
   closeSellerModal();
 }
-
 // ================= KPI =================
 const KPI_SELLER_URL = 'https://script.google.com/macros/s/AKfycbyWtQ1EyiNozegxE1W-PlXbUqpkWzuEFHyNp9IBBZ-RqSPiv4PqI38lGmwTPrWyMBx5/exec';
 
@@ -376,7 +406,7 @@ function logSellerPickKPI(seller) {
   }).catch(()=>{});
 }
 
-function showToast(message, duration = 3000) {
+function showToast(message, duration = 2500, type = 'warning') {
   let toast = document.getElementById("cart-toast");
 
   // si no existe, lo creo una vez
@@ -387,14 +417,25 @@ function showToast(message, duration = 3000) {
     document.body.appendChild(toast);
   }
 
+  // Limpiar clases anteriores y ocultar
+  toast.className = 'toast';
+  toast.classList.remove('show');
+  
+  // Aplicar tipo
+  if (type === 'success') {
+    toast.classList.add('success');
+  }
+
   toast.textContent = message;
 
-  // mostrar
+  // Mostrar después de un frame
   requestAnimationFrame(() => {
-    toast.classList.add("show");
+    requestAnimationFrame(() => {
+      toast.classList.add("show");
+    });
   });
 
-  // ocultar después de X ms
+  // Ocultar después de X ms
   clearTimeout(toast._hideTimer);
   toast._hideTimer = setTimeout(() => {
     toast.classList.remove("show");
