@@ -58,6 +58,9 @@ const Cart = (() => {
       });
     }
     save(); renderDrawer();
+    
+    // 🎯 Disparar animación del FAB
+    triggerCartAnimation();
   };
 
   const remove = (sku) => {
@@ -86,9 +89,32 @@ const Cart = (() => {
     const el = document.getElementById("cart-count");
     if (el){
       el.textContent = count();
-      el.classList.remove('bump');
-      void el.offsetWidth;
-      el.classList.add('bump');
+    }
+  };
+  
+  // 🎯 Función para disparar la animación del saltito
+  const triggerCartAnimation = () => {
+    const badge = document.getElementById("cart-count");
+    const fab = document.getElementById("cart-fab");
+    
+    if (badge) {
+      badge.classList.remove('bump');
+      void badge.offsetWidth; // Force reflow
+      badge.classList.add('bump');
+      
+      setTimeout(() => {
+        badge.classList.remove('bump');
+      }, 600);
+    }
+    
+    if (fab) {
+      fab.classList.remove('new-item');
+      void fab.offsetWidth;
+      fab.classList.add('new-item');
+      
+      setTimeout(() => {
+        fab.classList.remove('new-item');
+      }, 500);
     }
   };
 
@@ -261,11 +287,25 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!btn) return;
     sendOrderToSellerId(btn.dataset.id);
   });
+
+  // Botón para vaciar carrito (si existe en el HTML)
+  document.getElementById("cart-clear")?.addEventListener("click", () => {
+    if (confirm("¿Estás seguro que deseas vaciar el carrito?")) {
+      Cart.clear();
+      showToast("Carrito vaciado ✓", 2000, 'success');
+    }
+  });
 });
 
 // API global común para ambos catálogos
 window.Carrito = {
-  add: (payload) => Cart.add(payload)
+  add: (payload) => Cart.add(payload),
+  clear: () => {
+    if (confirm("¿Estás seguro que deseas vaciar el carrito?")) {
+      Cart.clear();
+      showToast("Carrito vaciado ✓", 2000, 'success');
+    }
+  }
 };
 
 // ================= Vendedores =================
@@ -278,6 +318,7 @@ const SELLERS = [
   { id: "v6", name: "Franco",    phone: "5493518025934", photo: "img/vendedores/6.webp", zona: "Rafaela"},
   { id: "v7", name: "Emiliano",    phone: "5493516645419", photo: "img/vendedores/9.webp", zona: "Rio Cuarto"},
   { id: "v3", name: "Pablo Gomez",  phone: "5493516645373", photo: "img/vendedores/12.webp" , zona: "Rio Cuarto"},
+  { id: "v9", name: "Nico prueba",  phone: "5493512260685", photo: "" , zona: "Rio Cuarto"}
 ];
 
 function openSellerModal(){
@@ -338,7 +379,14 @@ function sendOrderToSellerId(id){
   const url = `https://wa.me/${seller.phone}?text=${encodeURIComponent(msg)}`;
   window.open(url, "_blank");
 
-  setTimeout(() => { Cart.clear(); }, 150);
+  // Preguntar si quiere vaciar el carrito
+  setTimeout(() => {
+    if (confirm("¿Pedido enviado? ¿Deseas vaciar el carrito?")) {
+      Cart.clear();
+      showToast("Carrito vaciado ✓", 2000, 'success');
+    }
+  }, 1000);
+  
   closeSellerModal();
 }
 // ================= KPI =================
