@@ -11,6 +11,7 @@ const state = {
   seg: "todos",       // 'todos' | 'destacados'
   cat: "todas"        // 'todas' | '<categoría>'
 };
+window.state = state; // Exponer globalmente
 let ALL = [];         // cache de productos
 
 // ======= Fetch =======
@@ -119,23 +120,19 @@ function applyFilters() {
   renderCigarCards(grid, out);
 }
 
+// Exponer globalmente para que search-categories-unified.js pueda llamarla
+window.applyFilters = applyFilters;
+
 // ======= UI: construir chips de categorías =======
 function buildCategories(items) {
-  const catsWrap = document.getElementById("cats-wrap");
-  if (!catsWrap) return;
-
   const uniq = Array.from(
     new Set(items.map(r => r.Categoria).filter(Boolean))
   ).sort((a, b) => a.localeCompare(b, "es"));
 
-  catsWrap.innerHTML = [
-    `<label class="chip"><input type="radio" name="cat" value="todas" checked> Todas</label>`,
-    ...uniq.map(c => `<label class="chip"><input type="radio" name="cat" value="${c}"> ${c}</label>`)
-  ].join("");
-
-  catsWrap.addEventListener("change", (e) => {
-    if (e.target.name === "cat") { state.cat = e.target.value; applyFilters(); }
-  });
+  // Usar la nueva función buildCategoriesScroll
+  if (typeof window.buildCategoriesScroll === 'function') {
+    window.buildCategoriesScroll(uniq);
+  }
 }
 
 // ======= UI: buscador + botón filtros =======
