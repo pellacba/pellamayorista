@@ -1,6 +1,130 @@
 // ===== Configuración =====
 const CART_KEY = "cart_global";
 const MINIMO_PEDIDO = 30000;
+const SUPABASE_URL = "https://xwuprneexjwzjttujbiu.supabase.co";
+const STORAGE_BASE = `${SUPABASE_URL}/storage/v1/object/public/productos/`;
+
+// Función para generar URLs de imagen con múltiples fallbacks
+function getImageUrls(sku) {
+  if (!sku) return [];
+  
+  const base = STORAGE_BASE;
+  const s = String(sku);
+  
+  // Intentar múltiples ubicaciones y formatos
+  return [
+    `${base}${s}.webp?width=160&quality=80`,                    // raíz .webp
+    `${base}productos/${s}.webp?width=160&quality=80`,           // productos/ .webp
+    `${base}productos/${s}.png?width=160&quality=80`,            // productos/ .png
+    `${base}cigarrillos/${s}.webp?width=160&quality=80`,         // cigarrillos/ .webp
+    `${base}ofertas/${s}.webp?width=160&quality=80`,             // ofertas/ .webp
+  ];
+}
+
+// Función para intentar la siguiente URL cuando falla una imagen
+function tryNextImage(img) {
+  const container = img.parentElement;
+  const urls = JSON.parse(container.dataset.urls || '[]');
+  let current = parseInt(container.dataset.current || '0');
+  
+  current++;
+  
+  if (current < urls.length) {
+    container.dataset.current = current;
+    img.src = urls[current];
+  } else {
+    // Todas las URLs fallaron, mostrar emoji
+    container.innerHTML = '🛒';
+  }
+}
+
+// Exponer globalmente para que funcione el onerror
+window.tryNextImage = tryNextImage;
+
+
+// ===== Función showToast =====
+function showToast(message, duration = 2500, type = 'warning') {
+  let toast = document.getElementById("cart-toast");
+
+  // si no existe, lo creo una vez
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.id = "cart-toast";
+    toast.className = "toast";
+    document.body.appendChild(toast);
+  }
+
+  // Limpiar clases anteriores y ocultar
+  toast.className = 'toast';
+  toast.classList.remove('show');
+  
+  // Aplicar tipo
+  if (type === 'success') {
+    toast.classList.add('success');
+  }
+
+  toast.textContent = message;
+
+  // Mostrar después de un frame
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      toast.classList.add("show");
+    });
+  });
+
+  // Ocultar después de X ms
+  clearTimeout(toast._hideTimer);
+  toast._hideTimer = setTimeout(() => {
+    toast.classList.remove("show");
+  }, duration);
+}
+
+// ===== Función showConfirm (modal personalizado) =====
+function showConfirm(message) {
+  return new Promise((resolve) => {
+    // Crear backdrop
+    const backdrop = document.createElement('div');
+    backdrop.className = 'confirm-backdrop';
+    
+    // Crear modal
+    const modal = document.createElement('div');
+    modal.className = 'confirm-modal';
+    modal.innerHTML = `
+      <div class="confirm-content">
+        <p class="confirm-message">${message}</p>
+        <div class="confirm-buttons">
+          <button class="confirm-btn confirm-cancel">Cancelar</button>
+          <button class="confirm-btn confirm-accept">Aceptar</button>
+        </div>
+      </div>
+    `;
+    
+    document.body.appendChild(backdrop);
+    document.body.appendChild(modal);
+    
+    // Mostrar con animación
+    setTimeout(() => {
+      backdrop.classList.add('show');
+      modal.classList.add('show');
+    }, 10);
+    
+    // Función para cerrar
+    const close = (result) => {
+      backdrop.classList.remove('show');
+      modal.classList.remove('show');
+      setTimeout(() => {
+        backdrop.remove();
+        modal.remove();
+        resolve(result);
+      }, 300);
+    };
+    
+    // Eventos
+    modal.querySelector('.confirm-cancel').addEventListener('click', () => close(false));
+    modal.querySelector('.confirm-accept').addEventListener('click', () => close(true));
+    backdrop.addEventListener('click', () => close(false));
+  });
+}
 
 // ===== Utilidades =====
 const money = (n) => Number(n || 0).toLocaleString('es-AR', {
@@ -64,11 +188,15 @@ function renderCartItems() {
   container.innerHTML = cart.items.map((item, index) => {
     const itemTotal = item.price * item.qty;
     const discount = item.discount || 0;
+    const imageUrls = getImageUrls(item.sku);
     
     return `
       <div class="cart-item" data-index="${index}">
-        <div class="item-image">
-          🛒
+        <div class="item-image" data-urls='${JSON.stringify(imageUrls)}' data-current="0">
+          <img src="${imageUrls[0]}" 
+               alt="${item.name}" 
+               loading="lazy" 
+               onerror="tryNextImage(this)">
         </div>
         
         <div class="item-info">
@@ -148,9 +276,10 @@ function bindCartItemEvents() {
   
   // Eliminar item
   document.querySelectorAll('.item-remove').forEach(btn => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', async () => {
       const index = parseInt(btn.dataset.index);
-      if (confirm('¿Eliminar este producto del carrito?')) {
+      const confirmed = await showConfirm('¿Eliminar este producto del carrito?');
+      if (confirmed) {
         cart.items.splice(index, 1);
         saveCart();
         render();
@@ -187,10 +316,11 @@ function render() {
 }
 
 // ===== Vaciar carrito =====
-function clearCart() {
+async function clearCart() {
   if (cart.items.length === 0) return;
   
-  if (confirm('¿Estás seguro que deseas vaciar todo el carrito?')) {
+  const confirmed = await showConfirm('¿Estás seguro que deseas vaciar todo el carrito?');
+  if (confirmed) {
     cart.items = [];
     saveCart();
     render();
@@ -221,7 +351,7 @@ function openCheckout() {
   const { total } = calculateTotals();
   
   if (total < MINIMO_PEDIDO) {
-    alert(`El mínimo de compra es $${money(MINIMO_PEDIDO)}.\nTu total actual es $${money(total)}.`);
+    showToast(`El mínimo de compra es $${money(MINIMO_PEDIDO)}. Tu total actual es $${money(total)}.`, 4000);
     return;
   }
   
@@ -277,13 +407,13 @@ function buildOrderMessage() {
 function sendOrderToSeller(sellerId) {
   const msg = buildOrderMessage();
   if (!msg) {
-    alert("El carrito está vacío");
+    showToast("El carrito está vacío", 2500);
     return;
   }
 
   const seller = SELLERS.find(s => s.id === sellerId);
   if (!seller) {
-    alert("Vendedor inválido");
+    showToast("Vendedor inválido", 2500);
     return;
   }
 
@@ -294,8 +424,9 @@ function sendOrderToSeller(sellerId) {
   window.open(url, "_blank");
 
   // Preguntar si quiere vaciar el carrito
-  setTimeout(() => {
-    if (confirm("¿Pedido enviado? ¿Deseas vaciar el carrito?")) {
+  setTimeout(async () => {
+    const confirmed = await showConfirm("¿Pedido enviado? ¿Deseas vaciar el carrito?");
+    if (confirmed) {
       cart.items = [];
       saveCart();
       render();

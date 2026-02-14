@@ -263,7 +263,9 @@ function fmt(n){
 document.addEventListener("DOMContentLoaded", () => {
   Cart.load();
 
-  document.getElementById("cart-fab")?.addEventListener("click", Cart.openDrawer);
+  // El FAB del carrito redirige a cart.html (configurado en el HTML)
+  // document.getElementById("cart-fab")?.addEventListener("click", Cart.openDrawer);
+  
   document.getElementById("cart-close")?.addEventListener("click", Cart.closeDrawer);
 
   document.getElementById("cart-whatsapp")?.addEventListener("click", (e) => {

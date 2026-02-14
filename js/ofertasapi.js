@@ -11,6 +11,7 @@ const money = (n) =>
   });
 
 const state = { q: "", cat: "todas" };
+window.state = state; // Exponer globalmente para que search-categories-unified.js pueda acceder
 let ALL = [];
 let ALL_COMBOS = [];
 let PRODUCTOS_MAP = {};
@@ -129,16 +130,17 @@ function applyFilters() {
   const grid = document.getElementById("catalogo");
   const q = (state.q || "").trim().toLowerCase();
 
-  let out = [...ALL];
+  // Filtrar productos
+  let filteredProducts = [...ALL];
 
   if (state.cat !== "todas") {
-    out = out.filter(
+    filteredProducts = filteredProducts.filter(
       (r) => (r.Categoria || "").toLowerCase() === state.cat.toLowerCase(),
     );
   }
 
   if (q) {
-    out = out.filter(
+    filteredProducts = filteredProducts.filter(
       (r) =>
         (r.Descripcion || "").toLowerCase().includes(q) ||
         String(r.CodigoProd || "")
@@ -147,37 +149,57 @@ function applyFilters() {
     );
   }
 
-  // Solo eliminar productos, no combos ni títulos
+  // Filtrar combos existentes (mostrar/ocultar)
+  const allCombos = grid.querySelectorAll('.combo-card');
+  allCombos.forEach(comboCard => {
+    const comboName = comboCard.querySelector('.combo-title')?.textContent?.toLowerCase() || '';
+    
+    // Si hay búsqueda, filtrar por nombre del combo
+    if (q) {
+      if (comboName.includes(q)) {
+        comboCard.style.display = '';
+      } else {
+        comboCard.style.display = 'none';
+      }
+    }
+    // Si hay filtro de categoría (que no sea "todas"), ocultar combos
+    else if (state.cat !== "todas") {
+      comboCard.style.display = 'none';
+    }
+    // Sin filtros, mostrar todos los combos
+    else {
+      comboCard.style.display = '';
+    }
+  });
+
+  // También mostrar/ocultar el título de combos
+  const comboTitle = grid.querySelector('.combo-section-title');
+  if (comboTitle) {
+    const visibleCombos = Array.from(allCombos).filter(c => c.style.display !== 'none');
+    comboTitle.style.display = visibleCombos.length > 0 ? '' : 'none';
+  }
+
+  // Limpiar solo productos (no combos ni títulos)
   grid
     .querySelectorAll(".card:not(.combo-card)")
     .forEach((card) => card.remove());
 
-  // Renderizar productos
-  renderProductCards(grid, out);
+  // Renderizar productos filtrados
+  renderProductCards(grid, filteredProducts);
 }
 
-function buildCategories(items) {
-  const catsWrap = document.getElementById("cats-wrap");
-  if (!catsWrap) return;
+// Exponer globalmente para que search-categories-unified.js pueda llamarla
+window.applyFilters = applyFilters;
 
+function buildCategories(items) {
   const uniq = Array.from(
     new Set(items.map((r) => r.Categoria).filter(Boolean)),
   ).sort((a, b) => a.localeCompare(b, "es"));
 
-  catsWrap.innerHTML = [
-    `<label class="chip"><input type="radio" name="cat" value="todas" checked> Todas</label>`,
-    ...uniq.map(
-      (c) =>
-        `<label class="chip"><input type="radio" name="cat" value="${c}"> ${c}</label>`,
-    ),
-  ].join("");
-
-  catsWrap.addEventListener("change", (e) => {
-    if (e.target.name === "cat") {
-      state.cat = e.target.value;
-      applyFilters();
-    }
-  });
+  // Usar la nueva función buildCategoriesScroll
+  if (typeof window.buildCategoriesScroll === 'function') {
+    window.buildCategoriesScroll(uniq);
+  }
 }
 
 function setupSearch() {
