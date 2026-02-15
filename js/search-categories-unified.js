@@ -5,15 +5,52 @@ function buildCategoriesScroll(categories) {
   const container = document.getElementById('cats-wrap');
   if (!container) return;
   
+  // Separar categorías especiales
+  const combosIndex = categories.findIndex(cat => cat.toLowerCase() === 'combos');
+  const descuentosIndex = categories.findIndex(cat => cat.toLowerCase() === 'descuentos exclusivos');
+  
+  let hasCombos = false;
+  let hasDescuentos = false;
+  
+  // Quitar del array para reordenar
+  if (combosIndex !== -1) {
+    hasCombos = true;
+    categories.splice(combosIndex, 1);
+  }
+  
+  if (descuentosIndex !== -1) {
+    hasDescuentos = true;
+    const adjustedIndex = combosIndex !== -1 && descuentosIndex > combosIndex ? descuentosIndex - 1 : descuentosIndex;
+    categories.splice(adjustedIndex, 1);
+  }
+  
   // Crear chips de categorías
   const chips = [
-    // Botón "Todos" siempre primero
+    // 1. "Todos" siempre primero
     `<button class="category-chip active" data-category="todas">
       Todos
     </button>`
   ];
   
-  // Agregar categorías ordenadas
+  // 2. "Descuentos Exclusivos" segundo si existe
+  if (hasDescuentos) {
+    chips.push(`
+      <button class="category-chip" data-category="Descuentos Exclusivos">
+        Descuentos Exclusivos
+      </button>
+    `);
+  }
+  
+  // 3. "Combos" tercero si existe
+  if (hasCombos) {
+    chips.push(`
+      <button class="category-chip" data-category="Combos">
+        Combos
+      </button>
+    `);
+  }
+  
+  // 4. Resto de categorías ordenadas alfabéticamente
   categories.sort((a, b) => a.localeCompare(b, 'es')).forEach(cat => {
     chips.push(`
       <button class="category-chip" data-category="${cat}">
