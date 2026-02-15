@@ -20,7 +20,7 @@ let PRODUCTOS_MAP = {};
 async function fetchOfertas() {
   const url =
     `${SUPABASE_URL}/rest/v1/${TABLE}` +
-    `?select=CodigoProd,Descripcion,PrecioFinal,Proveedor,Categoria,Multiplos,ORDEN,Descuento` +
+    `?select=CodigoProd,Descripcion,PrecioFinal,Proveedor,Categoria,Multiplos,ORDEN,Descuento,TiempoExclusivo,FechaInicio,FechaFinal` +
     `&order=Descuento.desc.nullslast,ORDEN.asc,Proveedor.asc`;
 
   const res = await fetch(url, {
@@ -62,7 +62,7 @@ function imgUrl(pathOrSku) {
 }
 
 // ========== RENDER PRODUCTOS (sin borrar grid) ==========
-function renderProductCards(container, items) {
+function renderProductCards(container, items, insertAtStart = false) {
   if (!container) return;
   if (!Array.isArray(items)) items = [];
 
@@ -79,17 +79,28 @@ function renderProductCards(container, items) {
     const descNum = Number(String(descRaw).replace("%", "")) || 0;
     const priceEff = Math.round(base * (1 - descNum / 100) * 100) / 100;
 
-    const isDestacado = descNum > 0;
-    const ribbon =
-      descNum > 0
-        ? `<div class="discount-ribbon" aria-label="Descuento ${descNum}%"><span>${descNum}%</span></div>`
-        : "";
+    const isTiempoExclusivo = row.TiempoExclusivo === true || row.TiempoExclusivo === 'TRUE';
+    const isDestacado = descNum > 0 || isTiempoExclusivo;
+    
+    let ribbon = "";
+    if (isTiempoExclusivo) {
+      // Ribbon con contador para TiempoExclusivo
+      ribbon = `<div class="exclusive-timer-ribbon" data-sku="${sku}">
+        <div class="timer-icon">⚡</div>
+        <div class="timer-text">
+          <span class="timer-label">EXCLUSIVO</span>
+          <span class="timer-countdown" id="timer-${sku}">23:59:59</span>
+        </div>
+      </div>`;
+    } else if (descNum > 0) {
+      ribbon = `<div class="discount-ribbon" aria-label="Descuento ${descNum}%"><span>${descNum}%</span></div>`;
+    }
 
     const oldPrice =
       descNum > 0 ? `<div class="card-oldprice">$${money(base)}</div>` : "";
 
     const card = document.createElement("article");
-    card.className = `card ${isDestacado ? "destacado" : ""}`;
+    card.className = `card ${isDestacado ? "destacado" : ""} ${isTiempoExclusivo ? "tiempo-exclusivo" : ""}`;
     card.innerHTML = `
       ${ribbon}
       <div class="card-img">
@@ -122,7 +133,12 @@ function renderProductCards(container, items) {
     fragment.appendChild(card);
   });
 
-  container.appendChild(fragment);
+  // Si insertAtStart es true, insertar al principio
+  if (insertAtStart && container.firstChild) {
+    container.insertBefore(fragment, container.firstChild);
+  } else {
+    container.appendChild(fragment);
+  }
 }
 
 // ========== FILTROS ==========
@@ -130,10 +146,47 @@ function applyFilters() {
   const grid = document.getElementById("catalogo");
   const q = (state.q || "").trim().toLowerCase();
 
+  // Si la categoría es "Combos", mostrar solo combos
+  if (state.cat === "Combos" || state.cat === "combos") {
+    // Mostrar todos los combos
+    const allCombos = grid.querySelectorAll('.combo-card');
+    allCombos.forEach(comboCard => {
+      const comboName = comboCard.querySelector('.combo-title')?.textContent?.toLowerCase() || '';
+      
+      // Aplicar filtro de búsqueda si existe
+      if (q && !comboName.includes(q)) {
+        comboCard.style.display = 'none';
+      } else {
+        comboCard.style.display = '';
+      }
+    });
+    
+    // Mostrar título de combos
+    const comboTitle = grid.querySelector('.combo-section-title');
+    if (comboTitle) {
+      const visibleCombos = Array.from(allCombos).filter(c => c.style.display !== 'none');
+      comboTitle.style.display = visibleCombos.length > 0 ? '' : 'none';
+    }
+    
+    // Ocultar separador de productos
+    const separator = grid.querySelector('.products-separator');
+    if (separator) separator.style.display = 'none';
+    
+    // Ocultar todos los productos
+    grid.querySelectorAll(".card:not(.combo-card)").forEach((card) => card.remove());
+    
+    return; // No renderizar productos
+  }
+
   // Filtrar productos
   let filteredProducts = [...ALL];
 
-  if (state.cat !== "todas") {
+  // Si la categoría es "Descuentos Exclusivos", filtrar solo productos con descuento
+  if (state.cat === "Descuentos Exclusivos" || state.cat === "descuentos exclusivos") {
+    filteredProducts = filteredProducts.filter(
+      (r) => r.Descuento && r.Descuento > 0
+    );
+  } else if (state.cat !== "todas") {
     filteredProducts = filteredProducts.filter(
       (r) => (r.Categoria || "").toLowerCase() === state.cat.toLowerCase(),
     );
@@ -148,6 +201,17 @@ function applyFilters() {
           .includes(q),
     );
   }
+
+  // Filtrar productos exclusivos por fechas
+  filteredProducts = filterActiveExclusiveProducts(filteredProducts);
+
+  // Ordenar: TiempoExclusivo primero, luego el resto
+  const exclusiveProducts = filteredProducts.filter(p => 
+    p.TiempoExclusivo === true || p.TiempoExclusivo === 'TRUE'
+  );
+  const normalProducts = filteredProducts.filter(p => 
+    p.TiempoExclusivo !== true && p.TiempoExclusivo !== 'TRUE'
+  );
 
   // Filtrar combos existentes (mostrar/ocultar)
   const allCombos = grid.querySelectorAll('.combo-card');
@@ -178,14 +242,37 @@ function applyFilters() {
     const visibleCombos = Array.from(allCombos).filter(c => c.style.display !== 'none');
     comboTitle.style.display = visibleCombos.length > 0 ? '' : 'none';
   }
+  
+  // Mostrar separador de productos
+  const separator = grid.querySelector('.products-separator');
+  if (separator) separator.style.display = '';
 
   // Limpiar solo productos (no combos ni títulos)
   grid
     .querySelectorAll(".card:not(.combo-card)")
     .forEach((card) => card.remove());
 
-  // Renderizar productos filtrados
-  renderProductCards(grid, filteredProducts);
+  // Renderizar en orden:
+  // 1. Productos con TiempoExclusivo (al principio, antes de combos)
+  if (exclusiveProducts.length > 0) {
+    renderProductCards(grid, exclusiveProducts, true); // insertAtStart = true
+    
+    // Iniciar timers inmediatamente después de renderizar
+    console.log('🎯 Iniciando timers para productos exclusivos...');
+    setTimeout(() => {
+      console.log('⚡ Ejecutando startExclusiveTimers');
+      const timers = document.querySelectorAll('.timer-countdown');
+      console.log(`📊 Timers encontrados: ${timers.length}`);
+      startExclusiveTimers();
+    }, 300);
+  }
+  
+  // 2. Combos ya están en el DOM, solo ajustamos visibilidad (ya manejado arriba)
+  
+  // 3. Productos normales (al final)
+  if (normalProducts.length > 0) {
+    renderProductCards(grid, normalProducts, false);
+  }
 }
 
 // Exponer globalmente para que search-categories-unified.js pueda llamarla
@@ -195,6 +282,17 @@ function buildCategories(items) {
   const uniq = Array.from(
     new Set(items.map((r) => r.Categoria).filter(Boolean)),
   ).sort((a, b) => a.localeCompare(b, "es"));
+
+  // Agregar "Combos" si hay combos disponibles
+  if (ALL_COMBOS && ALL_COMBOS.length > 0) {
+    uniq.unshift("Combos"); // Agregar al principio
+  }
+  
+  // Agregar "Descuentos Exclusivos" si hay productos con descuento
+  const hasDiscounts = ALL.some(item => item.Descuento && item.Descuento > 0);
+  if (hasDiscounts) {
+    uniq.unshift("Descuentos Exclusivos");
+  }
 
   // Usar la nueva función buildCategoriesScroll
   if (typeof window.buildCategoriesScroll === 'function') {
@@ -433,9 +531,18 @@ ALL_COMBOS.forEach((combo) => {
             
             const comboName = `${name} (${productsDesc})`;
             
-            // Para combos fijos, usar el SKU base para que se agrupen
+            // Para combos fijos, crear SKU basado en productos para agrupar iguales
+            // Ordenar productos para que siempre genere el mismo SKU
+            const productsSku = groupKeys.map(key => {
+              const group = groups[key];
+              const product = group.products[0];
+              return `${product.productos}:${group.qty}`;
+            }).sort().join('-');
+            
+            const comboSku = `COMBO-${combo}-${productsSku}`;
+            
             window.Carrito?.add({
-              sku: combo,
+              sku: comboSku,
               name: comboName,
               price: Number(price),
               qty: 1,
@@ -708,7 +815,7 @@ function confirmComboSelection() {
     .map(p => `${p.sku}:${p.qty}`)
     .sort()
     .join('-');
-  const comboSku = `${currentComboSelection.combo}_${productsSku}`;
+  const comboSku = `COMBO-${currentComboSelection.combo}-${productsSku}`;
 
   // Agregar al carrito
   window.Carrito?.add({
@@ -738,3 +845,135 @@ document.addEventListener("DOMContentLoaded", () => {
     .getElementById("combo-confirm-btn")
     ?.addEventListener("click", confirmComboSelection);
 });
+
+// ========== CONTADOR DE TIEMPO EXCLUSIVO ==========
+function startExclusiveTimers() {
+  console.log('🔧 startExclusiveTimers iniciado');
+  
+  // Obtener todos los elementos con timer
+  const timers = document.querySelectorAll('.timer-countdown');
+  
+  console.log(`📊 Total de timers encontrados: ${timers.length}`);
+  
+  timers.forEach((timerElement, index) => {
+    console.log(`🔄 Procesando timer ${index + 1}/${timers.length}`);
+    
+    const sku = timerElement.id.replace('timer-', '');
+    console.log(`📝 SKU: ${sku}`);
+    
+    // Buscar el producto en ALL para obtener fechas
+    const product = ALL.find(p => p.CodigoProd === sku);
+    if (!product) {
+      console.error(`❌ Producto no encontrado para SKU: ${sku}`);
+      return;
+    }
+    
+    console.log(`✅ Producto encontrado:`, product);
+    
+    // Obtener fechas de inicio y fin desde la BD
+    // Si FechaInicio es NULL, usar la fecha actual
+    const fechaInicio = product.FechaInicio ? new Date(product.FechaInicio).getTime() : Date.now();
+    const fechaFin = product.FechaFinal ? new Date(product.FechaFinal).getTime() : null;
+    
+    console.log(`⚡ Iniciando timer para SKU ${sku}:`, {
+      FechaInicio: product.FechaInicio,
+      FechaFinal: product.FechaFinal,
+      fechaInicioMs: fechaInicio,
+      fechaFinMs: fechaFin
+    });
+    
+    if (!fechaFin) {
+      console.warn(`Producto ${sku} no tiene FechaFinal configurada`);
+      timerElement.textContent = '00:00:00';
+      return;
+    }
+    
+    // Actualizar el contador cada segundo
+    const updateTimer = () => {
+      const now = Date.now();
+      
+      console.log(`⏱️ Actualizando timer ${sku}:`, { now, fechaInicio, fechaFin });
+      
+      // Verificar si la oferta ya comenzó
+      if (now < fechaInicio) {
+        console.log(`⏳ Oferta aún no comienza`);
+        timerElement.textContent = 'Próximamente';
+        setTimeout(updateTimer, 1000);
+        return;
+      }
+      
+      // Calcular tiempo restante
+      const remaining = fechaFin - now;
+      
+      console.log(`⏰ Tiempo restante: ${remaining}ms`);
+      
+      if (remaining <= 0) {
+        console.log(`❌ Oferta terminada`);
+        timerElement.textContent = '00:00:00';
+        // Opcional: ocultar o remover el producto
+        const card = timerElement.closest('.card');
+        if (card) {
+          card.style.opacity = '0.5';
+          const btn = card.querySelector('.card-add');
+          if (btn) btn.disabled = true;
+        }
+        return;
+      }
+      
+      const hours = Math.floor(remaining / (1000 * 60 * 60));
+      const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
+      
+      const timeString = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+      console.log(`✅ Timer actualizado:`, timeString);
+      
+      timerElement.textContent = timeString;
+      
+      setTimeout(updateTimer, 1000);
+    };
+    
+    console.log(`🚀 Iniciando updateTimer para ${sku}`);
+    updateTimer();
+  });
+}
+
+// Función para filtrar productos exclusivos activos
+function filterActiveExclusiveProducts(products) {
+  const now = Date.now();
+  
+  return products.filter(p => {
+    if (p.TiempoExclusivo !== true && p.TiempoExclusivo !== 'TRUE') {
+      return true; // No es exclusivo, incluirlo
+    }
+    
+    // Es exclusivo, verificar fechas
+    const fechaInicio = p.FechaInicio ? new Date(p.FechaInicio).getTime() : Date.now();
+    const fechaFin = p.FechaFinal ? new Date(p.FechaFinal).getTime() : null;
+    
+    console.log('🔍 Producto exclusivo:', p.CodigoProd, {
+      FechaInicio: p.FechaInicio,
+      FechaFinal: p.FechaFinal,
+      fechaInicioMs: fechaInicio,
+      fechaFinMs: fechaFin,
+      nowMs: now,
+      dentroRango: fechaFin && now >= fechaInicio && now <= fechaFin
+    });
+    
+    if (!fechaFin) {
+      console.log('❌ Sin FechaFinal');
+      return false; // Sin FechaFinal, no mostrar
+    }
+    
+    // Mostrar solo si está dentro del rango
+    const result = now >= fechaInicio && now <= fechaFin;
+    console.log(result ? '✅ Mostrar producto' : '❌ Fuera de rango');
+    return result;
+  });
+}
+
+// Iniciar timers cuando se rendericen productos
+const originalRenderProductCards = renderProductCards;
+renderProductCards = function(...args) {
+  originalRenderProductCards.apply(this, args);
+  setTimeout(startExclusiveTimers, 100);
+};
