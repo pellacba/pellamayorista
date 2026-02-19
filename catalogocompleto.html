@@ -19,9 +19,15 @@
   </div>
 
   <header class="page-header">
-    <a href="index.html" class="page-logo" aria-label="Volver a inicio">
+    <button onclick="window.location.href='index.html'" class="back-arrow" aria-label="Volver">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+    </button>
+    <a href="index.html" class="page-logo page-logo-center" aria-label="Volver a inicio">
       <img src="img/pclogo.png" alt="Pella" />
     </a>
+    <div class="header-spacer"></div>
   </header>
 
   <!-- Buscador y Categorías Unificadas -->
