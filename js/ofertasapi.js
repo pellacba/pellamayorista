@@ -35,7 +35,6 @@ async function fetchOfertas() {
     try {
       err = await res.json();
     } catch {}
-    console.error("Supabase error:", err);
     throw new Error(`${res.status} ${res.statusText}`);
   }
   return res.json();
@@ -258,12 +257,9 @@ function applyFilters() {
     renderProductCards(grid, exclusiveProducts, true); // insertAtStart = true
     
     // Iniciar timers inmediatamente después de renderizar
-    console.log('🎯 Iniciando timers para productos exclusivos...');
     setTimeout(() => {
-      console.log('⚡ Ejecutando startExclusiveTimers');
       const timers = document.querySelectorAll('.timer-countdown');
-      console.log(`📊 Timers encontrados: ${timers.length}`);
-      startExclusiveTimers();
+      startExclusiveTimers(exclusiveProducts); // Pasar productos como parámetro
     }, 300);
   }
   
@@ -562,7 +558,6 @@ ALL_COMBOS.forEach((combo) => {
     // Renderizar productos normales
     applyFilters();
   } catch (e) {
-    console.error(e);
     if (grid)
       grid.innerHTML = `<p style="color:#fff">No se pudo cargar el listado.</p>`;
   }
@@ -847,43 +842,30 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // ========== CONTADOR DE TIEMPO EXCLUSIVO ==========
-function startExclusiveTimers() {
-  console.log('🔧 startExclusiveTimers iniciado');
+function startExclusiveTimers(products = []) {
   
   // Obtener todos los elementos con timer
   const timers = document.querySelectorAll('.timer-countdown');
   
-  console.log(`📊 Total de timers encontrados: ${timers.length}`);
   
   timers.forEach((timerElement, index) => {
-    console.log(`🔄 Procesando timer ${index + 1}/${timers.length}`);
     
     const sku = timerElement.id.replace('timer-', '');
-    console.log(`📝 SKU: ${sku}`);
     
-    // Buscar el producto en ALL para obtener fechas
-    const product = ALL.find(p => p.CodigoProd === sku);
+    // Buscar el producto en el array pasado como parámetro
+    // Comparar tanto como string como number
+    const product = products.find(p => p.CodigoProd == sku || String(p.CodigoProd) === sku);
     if (!product) {
-      console.error(`❌ Producto no encontrado para SKU: ${sku}`);
       return;
     }
     
-    console.log(`✅ Producto encontrado:`, product);
     
     // Obtener fechas de inicio y fin desde la BD
     // Si FechaInicio es NULL, usar la fecha actual
     const fechaInicio = product.FechaInicio ? new Date(product.FechaInicio).getTime() : Date.now();
     const fechaFin = product.FechaFinal ? new Date(product.FechaFinal).getTime() : null;
     
-    console.log(`⚡ Iniciando timer para SKU ${sku}:`, {
-      FechaInicio: product.FechaInicio,
-      FechaFinal: product.FechaFinal,
-      fechaInicioMs: fechaInicio,
-      fechaFinMs: fechaFin
-    });
-    
     if (!fechaFin) {
-      console.warn(`Producto ${sku} no tiene FechaFinal configurada`);
       timerElement.textContent = '00:00:00';
       return;
     }
@@ -892,11 +874,9 @@ function startExclusiveTimers() {
     const updateTimer = () => {
       const now = Date.now();
       
-      console.log(`⏱️ Actualizando timer ${sku}:`, { now, fechaInicio, fechaFin });
       
       // Verificar si la oferta ya comenzó
       if (now < fechaInicio) {
-        console.log(`⏳ Oferta aún no comienza`);
         timerElement.textContent = 'Próximamente';
         setTimeout(updateTimer, 1000);
         return;
@@ -905,10 +885,8 @@ function startExclusiveTimers() {
       // Calcular tiempo restante
       const remaining = fechaFin - now;
       
-      console.log(`⏰ Tiempo restante: ${remaining}ms`);
       
       if (remaining <= 0) {
-        console.log(`❌ Oferta terminada`);
         timerElement.textContent = '00:00:00';
         // Opcional: ocultar o remover el producto
         const card = timerElement.closest('.card');
@@ -925,14 +903,12 @@ function startExclusiveTimers() {
       const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
       
       const timeString = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-      console.log(`✅ Timer actualizado:`, timeString);
       
       timerElement.textContent = timeString;
       
       setTimeout(updateTimer, 1000);
     };
     
-    console.log(`🚀 Iniciando updateTimer para ${sku}`);
     updateTimer();
   });
 }
@@ -950,23 +926,12 @@ function filterActiveExclusiveProducts(products) {
     const fechaInicio = p.FechaInicio ? new Date(p.FechaInicio).getTime() : Date.now();
     const fechaFin = p.FechaFinal ? new Date(p.FechaFinal).getTime() : null;
     
-    console.log('🔍 Producto exclusivo:', p.CodigoProd, {
-      FechaInicio: p.FechaInicio,
-      FechaFinal: p.FechaFinal,
-      fechaInicioMs: fechaInicio,
-      fechaFinMs: fechaFin,
-      nowMs: now,
-      dentroRango: fechaFin && now >= fechaInicio && now <= fechaFin
-    });
-    
     if (!fechaFin) {
-      console.log('❌ Sin FechaFinal');
       return false; // Sin FechaFinal, no mostrar
     }
     
     // Mostrar solo si está dentro del rango
     const result = now >= fechaInicio && now <= fechaFin;
-    console.log(result ? '✅ Mostrar producto' : '❌ Fuera de rango');
     return result;
   });
 }
