@@ -1,11 +1,57 @@
+/* ===== BOTÓN CARGAR MÁS ===== */
+.load-more-btn {
+  -webkit-appearance: none;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: fit-content;
+  margin: 8px auto 0;
+  padding: 14px 36px;
+  background: linear-gradient(135deg, #7c3aed, #a855f7);
+  border: none;
+  border-radius: 50px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  color: #fff;
+  cursor: pointer;
+  letter-spacing: 0.3px;
+  box-shadow: 0 4px 16px rgba(124, 58, 237, 0.4);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.load-more-btn:hover,
+.load-more-btn:focus,
+.load-more-btn:focus-visible {
+  background: linear-gradient(135deg, #7c3aed, #a855f7);
+  color: #fff;
+  outline: none;
+}
+.load-more-btn:active {
+  background: linear-gradient(135deg, #7c3aed, #a855f7);
+  color: #fff;
+  transform: scale(0.97);
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.3);
+}
+
+/* ===== FOOTER DEL CATÁLOGO ===== */
+#catalog-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 16px 90px;
+}
+
 .volver-todos-btn {
-  grid-column: 1 / -1;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
   width: fit-content;
-  margin: 24px auto 16px;
+  margin: 0 auto;
   padding: 15px 40px;
   background: #fff;
   border: 3px solid #1a1a1a;

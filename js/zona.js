@@ -38,9 +38,7 @@
         );
         if (!res.ok) throw new Error("Stock fetch failed: " + res.status);
         const data = await res.json();
-        console.log(`[Zona] Tabla: ${table} | Filas con stock > 0: ${data.length}`, data.slice(0, 5));
         const set = new Set(data.map((r) => String(r.art_id)));
-        console.log(`[Zona] Set de art_ids (primeros 10):`, [...set].slice(0, 10));
         return set;
       } catch (e) {
         console.error("[Zona] No se pudo cargar el stock:", e);
