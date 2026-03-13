@@ -1,3 +1,39 @@
+.volver-todos-btn {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: fit-content;
+  margin: 24px auto 16px;
+  padding: 15px 40px;
+  background: #fff;
+  border: 3px solid #1a1a1a;
+  border-radius: 50px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 15px;
+  font-weight: 900;
+  color: #1a1a1a;
+  cursor: pointer;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  box-shadow: 4px 4px 0px #1a1a1a;
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+.volver-todos-btn::before {
+  content: '←';
+  font-size: 18px;
+  line-height: 1;
+}
+.volver-todos-btn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px #1a1a1a;
+}
+.volver-todos-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px #1a1a1a;
+}
+
 :root{
   --header-h: 78px;                 
   --gap-d: 20px;                     
@@ -11,7 +47,7 @@
 
 body{
   background:linear-gradient(90deg, #ff3131 0%, #ff914d 100%);
-  font-family: 'Poppins', system-ui, sans-serif;
+  font-family: 'Montserrat', system-ui, sans-serif;
   margin: 0;
 }
 
@@ -100,16 +136,17 @@ body.ofertas-page{
 }
 
 .card-img{
-  display: grid;
-  place-items: center;
+  position: relative;
   width: 100%;
-  aspect-ratio: 1/0.8;
+  aspect-ratio: 1/1;
   border-radius: calc(var(--radius) - 6px);
   overflow: hidden;
 }
 .card-img img{
-  width: 130px;
-  height: auto;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
   filter: drop-shadow(0 4px 10px rgba(0,0,0,.15));
   user-select: none; -webkit-user-drag: none;
@@ -163,7 +200,7 @@ body.ofertas-page{
   border-radius: 999px;
   background: #ffffff;
   color: var(--text-dark);
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: medium;
   font-weight: bold;
   padding: 12px 16px;
@@ -352,7 +389,7 @@ body.ofertas-page{
 .timer-countdown {
   font-size: 18px;
   font-weight: 800;
-  font-family: 'Courier New', monospace;
+  font-family: 'Montserrat', sans-serif;
   letter-spacing: 2px;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
   background: rgba(0, 0, 0, 0.1);
@@ -380,7 +417,67 @@ body.ofertas-page{
   }
 }
 
+/* ===== OFERTA POR CANTIDAD ===== */
+.card.oferta-cantidad {
+  border: 4px solid #f5c800;
+  box-shadow: 0 0 16px rgba(245, 200, 0, 0.5),
+              0 8px 24px rgba(0, 0, 0, 0.25);
+  animation: glow-cantidad 2s ease-in-out infinite alternate;
+}
+
+@keyframes glow-cantidad {
+  from { box-shadow: 0 0 10px rgba(245, 200, 0, 0.4), 0 8px 20px rgba(0,0,0,.2); }
+  to   { box-shadow: 0 0 24px rgba(245, 200, 0, 0.75), 0 10px 28px rgba(0,0,0,.28); }
+}
+
+.oferta-cantidad-banner {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(90deg, #f5c800 0%, #ffe566 50%, #f5c800 100%);
+  background-size: 200% 100%;
+  animation: shimmer-cantidad 2.8s linear infinite;
+  color: #111;
+  font-size: 12px;
+  font-weight: 800;
+  text-align: center;
+  padding: 8px 10px;
+  margin: -16px -16px 12px -16px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  text-shadow: none;
+}
+
+.oferta-cantidad-banner::before {
+  content: "🏷️";
+  font-size: 14px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+@keyframes shimmer-cantidad {
+  0%   { background-position: 200% center; }
+  100% { background-position: -200% center; }
+}
+
 @media (max-width: 480px) {
+  .oferta-cantidad-banner {
+    font-size: 10px;
+    padding: 7px 10px;
+    letter-spacing: 0.3px;
+  }
+
+  .oferta-cantidad-banner.has-ribbon {
+    padding-left: 68px;
+  }
+
+  .oferta-cantidad-banner::before {
+    display: none;
+  }
+
   .exclusive-timer-ribbon {
     padding: 8px 12px;
     gap: 8px;
@@ -425,7 +522,7 @@ body.ofertas-page{
   border-radius: 12px;
   border: 0;
   padding: 0 14px;
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 16px;
   outline: none;
   background: #ffffffea;
@@ -674,21 +771,21 @@ body.ofertas-page{
 }
 
 .combo-option-group {
-  border: 2px solid #e5e7eb;
+  border: 2px solid rgba(255,255,255,0.12);
   border-radius: 10px;
   padding: 12px;
-  background: #f9fafb;
+  background: rgba(15, 5, 5, 0.70);
 }
 
 .combo-option-group.required {
   border-color: #fbbf24;
-  background: #fffbeb;
+  background: rgba(30, 15, 0, 0.75);
 }
 
 .combo-option-group h4 {
   margin: 0 0 10px 0;
   font-size: 14px;
-  color: #0a0f1c;
+  color: #fff;
   font-weight: 700;
 }
 
@@ -708,16 +805,16 @@ body.ofertas-page{
   align-items: center;
   gap: 10px;
   padding: 8px;
-  background: white;
+  background: rgba(255,255,255,0.08);
   border-radius: 6px;
   cursor: pointer;
-  border: 2px solid transparent;
+  border: 2px solid rgba(255,255,255,0.10);
   transition: all 0.2s;
 }
 
 .combo-option-item:hover {
   border-color: #fbbf24;
-  background: #fffbeb;
+  background: rgba(251, 191, 36, 0.15);
 }
 
 .combo-option-item input[type="radio"],
@@ -732,7 +829,7 @@ body.ofertas-page{
   flex: 1;
   cursor: pointer;
   font-size: 13px;
-  color: #0a0f1c;
+  color: #fff;
   font-weight: 600;
   margin: 0;
 }
@@ -846,7 +943,7 @@ body.ofertas-page{
   color: white;
   padding: 12px 20px;
   border-radius: 12px;
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 14px;
   font-weight: 600;
   box-shadow: 0 8px 24px rgba(255, 49, 49, 0.5);
@@ -1062,7 +1159,7 @@ body.ofertas-page{
   color: #ef4444;
   border: 2px solid #ef4444;
   border-radius: 8px;
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-weight: 600;
   font-size: 13px;
   cursor: pointer;

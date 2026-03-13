@@ -347,33 +347,74 @@ function showNotification(title, price, duration = 3000) {
 }
 
 // ===== Checkout (seleccionar vendedor) =====
+let checkedOpSkus = new Set();
+
 function openCheckout() {
   const { total } = calculateTotals();
-  
+
   if (total < MINIMO_PEDIDO) {
     showToast(`El mínimo de compra es $${money(MINIMO_PEDIDO)}. Tu total actual es $${money(total)}.`, 4000);
     return;
   }
-  
+
+  const opItems = cart.items.filter(i => i.ofertaPorCantidad === true);
+  if (opItems.length > 0) {
+    openOportunidadModal(opItems);
+  } else {
+    openSellerModal();
+  }
+}
+
+function openOportunidadModal(items) {
+  const list = document.getElementById('oportunidad-list');
+  if (list) {
+    list.innerHTML = items.map(item => `
+      <li class="op-item">
+        <span class="op-name">${item.name}</span>
+        <label class="op-check-label">
+          <input type="checkbox" class="op-check" data-sku="${item.sku}" checked>
+          <span class="op-check-yes">Sí, quiero saber</span>
+        </label>
+      </li>
+    `).join('');
+  }
+  document.getElementById('oportunidad-backdrop')?.classList.add('open');
+  document.getElementById('oportunidad-modal')?.classList.add('open');
+}
+
+function closeOportunidadModal() {
+  document.getElementById('oportunidad-backdrop')?.classList.remove('open');
+  document.getElementById('oportunidad-modal')?.classList.remove('open');
+}
+
+function confirmOportunidad() {
+  checkedOpSkus = new Set();
+  document.querySelectorAll('.op-check:checked').forEach(cb => {
+    checkedOpSkus.add(String(cb.dataset.sku));
+  });
+  closeOportunidadModal();
   openSellerModal();
 }
 
 // ===== Modal de vendedores =====
 const SELLERS = [
-  { id: "v1", name: "Jhonatan", phone: "5493516645324", photo: "img/vendedores/7.webp", zona: "Punilla" },
-  { id: "v2", name: "Marcos", phone: "5493516645332", photo: "img/vendedores/10.webp", zona: "Villa María" },
-  { id: "v4", name: "Mauro", phone: "5493518747562", photo: "img/vendedores/4.webp", zona: "San Francisco" },
-  { id: "v5", name: "Pablo", phone: "5493512038696", photo: "img/vendedores/5.webp", zona: "San Francisco" },
-  { id: "v8", name: "Dario", phone: "5493516645322", photo: "img/vendedores/11.webp", zona: "Rio Tercero" },
-  { id: "v6", name: "Franco", phone: "5493518025934", photo: "img/vendedores/6.webp", zona: "Rafaela" },
-  { id: "v7", name: "Emiliano", phone: "5493516645419", photo: "img/vendedores/9.webp", zona: "Rio Cuarto" },
-  { id: "v3", name: "Pablo Gomez", phone: "5493516645373", photo: "img/vendedores/12.webp", zona: "Rio Cuarto" }
+  { id: "v1", name: "Jhonatan",   phone: "5493516645324", photo: "img/vendedores/7.webp",  zona: "Punilla",       deposito: ["rio3"] },
+  { id: "v2", name: "Marcos",     phone: "5493516645332", photo: "img/vendedores/10.webp", zona: "Villa María",   deposito: ["rio3"] },
+  { id: "v4", name: "Mauro",      phone: "5493518747562", photo: "img/vendedores/4.webp",  zona: "San Francisco", deposito: ["sf"] },
+  { id: "v5", name: "Pablo",      phone: "5493512038696", photo: "img/vendedores/5.webp",  zona: "San Francisco", deposito: ["sf"] },
+  { id: "v8", name: "Dario",      phone: "5493516645322", photo: "img/vendedores/11.webp", zona: "Rio Tercero",   deposito: ["rio3"] },
+  { id: "v6", name: "Franco",     phone: "5493518025934", photo: "img/vendedores/6.webp",  zona: "Rafaela",       deposito: ["sf"] },
+  { id: "v7", name: "Emiliano",   phone: "5493516645419", photo: "img/vendedores/9.webp",  zona: "Rio Cuarto",    deposito: ["rio3"] },
+  { id: "v3", name: "Pablo Gomez",phone: "5493516645373", photo: "img/vendedores/12.webp", zona: "Rio Cuarto",    deposito: ["rio3"] }
 ];
 
 function openSellerModal() {
+  const zona = localStorage.getItem('pellaclick_zona');
+  const filtered = zona ? SELLERS.filter(s => s.deposito.includes(zona)) : SELLERS;
+
   const list = document.getElementById("seller-list");
   if (list) {
-    list.innerHTML = SELLERS.map(s => `
+    list.innerHTML = filtered.map(s => `
       <li class="seller-item">
         <button type="button" class="seller-pick" data-id="${s.id}">
           <img src="${s.photo}" alt="${s.name}" class="seller-photo" />
@@ -398,9 +439,13 @@ function buildOrderMessage() {
   const lines = cart.items.map(it => {
     const discount = Number(it.discount) || 0;
     const discountText = discount > 0 ? `, Descuento: ${discount}%` : '';
-    return `• ${it.name} , Cantidad: ${it.qty}, Precio: $${it.price}${discountText}`;
+    let line = `• ${it.name} , Cantidad: ${it.qty}, Precio: $${it.price}${discountText}`;
+    if (checkedOpSkus.has(String(it.sku))) {
+      line += `\n  *QUIERO CONOCER LA OPORTUNIDAD EXTRA DE ESTE PRODUCTO*`;
+    }
+    return line;
   });
-  
+
   return `¡Hola! Quiero hacer este pedido:\n\n${lines.join("\n")}\n\n`;
 }
 
@@ -493,6 +538,15 @@ document.addEventListener('DOMContentLoaded', () => {
   // Botón checkout
   document.getElementById('checkout-btn')?.addEventListener('click', openCheckout);
   
+  // Modal oportunidad
+  document.getElementById('oportunidad-confirm')?.addEventListener('click', confirmOportunidad);
+  document.getElementById('oportunidad-skip')?.addEventListener('click', () => {
+    checkedOpSkus = new Set();
+    closeOportunidadModal();
+    openSellerModal();
+  });
+  document.getElementById('oportunidad-backdrop')?.addEventListener('click', closeOportunidadModal);
+
   // Modal vendedor
   document.getElementById('seller-close')?.addEventListener('click', closeSellerModal);
   document.getElementById('seller-backdrop')?.addEventListener('click', closeSellerModal);

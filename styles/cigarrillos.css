@@ -29,7 +29,7 @@ body {
   padding: 0;
   height: 100%;
   width: 100%;
-  font-family: "Poppins", sans-serif;
+  font-family: "Montserrat", sans-serif;
 }
 
 
@@ -250,7 +250,7 @@ body {
   padding: 3px 8px;
   text-align: center;
   border-radius: 999px;
-  font: 800 12px/1 "Poppins", system-ui;
+  font: 800 12px/1 "Montserrat", system-ui;
   color: #111;
   background: #fff;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
@@ -366,7 +366,7 @@ body {
 
 .cart-header h2 {
   margin: 0;
-  font: 800 clamp(20px, 4vw, 24px) / 1 "Poppins", system-ui;
+  font: 800 clamp(20px, 4vw, 24px) / 1 "Montserrat", system-ui;
   letter-spacing: 0.3px;
 }
 .cart-close {
@@ -416,7 +416,7 @@ body {
   grid-template-columns: 1fr auto;
   padding: 10px 16px;
   color: var(--cart-muted);
-  font: 600 13px/1 Poppins, system-ui;
+  font: 600 13px/1 Montserrat, system-ui;
   text-transform: uppercase;
   letter-spacing: 0.8px;
 }
@@ -465,7 +465,7 @@ body {
 
 .cart-item h4 {
   margin: 0;
-  font: 700 clamp(14px, 3.2vw, 16px) / 1.25 "Poppins", system-ui;
+  font: 700 clamp(14px, 3.2vw, 16px) / 1.25 "Montserrat", system-ui;
   letter-spacing: 0.2px;
   text-transform: uppercase;
 }
@@ -486,7 +486,7 @@ body {
   display: inline-block;
   margin-left: 8px;
   padding: 2px 8px;
-  font: 800 12px/1 "Poppins", system-ui;
+  font: 800 12px/1 "Montserrat", system-ui;
   color: #fff;
   background: linear-gradient(135deg,#7c3aed,#a855f7);
   border-radius: 999px;
@@ -524,7 +524,7 @@ body {
   height: 36px;
   border-radius: 10px;
   text-align: center;
-  font: 700 15px/36px "Poppins", system-ui;
+  font: 700 15px/36px "Montserrat", system-ui;
   color: #fff;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--cart-bord);
@@ -550,7 +550,7 @@ body {
   border: 1px solid #0f5c2b;
   color: #10321b;
   background: linear-gradient(180deg, #baf6c6, #a9efbb);
-  font: 800 16px/1 "Poppins", system-ui;
+  font: 800 16px/1 "Montserrat", system-ui;
   box-shadow: 0 10px 0 #0f5c2b, 0 18px 34px rgba(0, 0, 0, 0.25);
   cursor: pointer;
   transition: transform 0.08s ease, box-shadow 0.2s ease, filter 0.2s ease;
@@ -585,7 +585,7 @@ body {
   font-size: 14px;
   cursor: pointer;
   transition: background 0.2s ease, transform 0.1s ease;
-  font-family: "Poppins", sans-serif;
+  font-family: "Montserrat", sans-serif;
 }
 .remove:hover {
   background: #dc2626;
@@ -734,7 +734,7 @@ input[type="number"]::-webkit-inner-spin-button{
   border-radius: 18px;
   box-shadow: 0 24px 64px rgba(0,0,0,.45);
   overflow: hidden;
-  font-family: "Poppins", system-ui, sans-serif;
+  font-family: "Montserrat", system-ui, sans-serif;
 }
 
 /* Header con título y botón cerrar */
