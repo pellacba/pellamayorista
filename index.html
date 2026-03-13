@@ -6,14 +6,14 @@
     <link rel="shortcut icon" href="img/pellalogo.png" type="image/x-icon">
     <link rel="preconnect" href="https://fonts.googleapis.com"> 
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <link rel="stylesheet" href="styles/styles.css" />
     <link rel="stylesheet" href="styles/animations.css">
     <link rel="stylesheet" href="styles/mediaconfg.css">
     <link rel="stylesheet" href="styles/onboarding.css">
+    <link rel="stylesheet" href="styles/zona.css">
+    <link rel="stylesheet" href="styles/index-preview.css">
 
         <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-P5KE5XME2V"></script>
@@ -35,14 +35,55 @@
     <main class="card" role="main">
       <header class="brand">
         <img src="img/pclogo.png" alt="Pella" class="logo">
-        <p class="subtitle">una forma fácil de comprar</p>
+        <p class="subtitle">una forma fácil de pedir</p>
       </header>
 
-      <nav class="actions" aria-label="Selección de catálogo">
-        <button class="btn" data-link="cigarrillos.html">CIGARRILLOS</button>
-        <button class="btn" data-link="catalogocompleto.html">CATÁLOGO</button>
-      </nav>
-<!-- 
+      <div style="padding: 0 24px;">
+        <button class="zona-chip hidden" id="zona-chip-btn" onclick="window.abrirSelectorZona()">
+          <span class="zona-chip__dot"></span>
+          <span id="zona-chip-label"></span>
+          · Cambiar zona
+        </button>
+      </div>
+
+      <!-- Preview sections -->
+      <div class="preview-sections">
+        <section class="preview-section">
+          <div class="preview-header">
+            <span class="preview-title">🚬 Cigarrillos</span>
+            <a href="cigarrillos.html" class="preview-ver-todo">ver todo</a>
+          </div>
+          <div class="preview-scroll-wrapper">
+            <button class="prev-arrow prev-arrow--left" onclick="scrollPreview('preview-cigarrillos', -1)" aria-label="Anterior">&#8249;</button>
+            <div class="preview-scroll" id="preview-cigarrillos">
+              <p class="preview-placeholder">Seleccioná tu zona para ver productos</p>
+            </div>
+            <button class="prev-arrow prev-arrow--right" onclick="scrollPreview('preview-cigarrillos', 1)" aria-label="Siguiente">&#8250;</button>
+          </div>
+        </section>
+
+        <section class="preview-section">
+          <div class="preview-header">
+            <span class="preview-title">📦 Catálogo</span>
+            <a href="catalogocompleto.html" class="preview-ver-todo">ver todo</a>
+          </div>
+          <div class="preview-scroll-wrapper">
+            <button class="prev-arrow prev-arrow--left" onclick="scrollPreview('preview-catalogo', -1)" aria-label="Anterior">&#8249;</button>
+            <div class="preview-scroll" id="preview-catalogo">
+              <p class="preview-placeholder">Seleccioná tu zona para ver productos</p>
+            </div>
+            <button class="prev-arrow prev-arrow--right" onclick="scrollPreview('preview-catalogo', 1)" aria-label="Siguiente">&#8250;</button>
+          </div>
+        </section>
+
+        <!-- Banner canal de difusión -->
+        <a href="https://whatsapp.com/channel/0029Vb7idUpKWEKzM3QDqn1r" target="_blank" rel="noopener noreferrer" style="display:block;">
+          <img src="img/canalDeDifBannerPella.png" alt="Canal de difusión Pella"
+            style="width:100%; display:block; border-radius: 0 18px 0 18px;">
+        </a>
+      </div>
+
+<!--
   <div id="popup" class="popup-overlay" aria-hidden="true">
   <div class="popup-content" role="dialog" aria-modal="true" aria-label="Canal de difusión">
     <button class="popup-close" type="button" aria-label="Cerrar" onclick="cerrarPopup()">&times;</button>
@@ -84,18 +125,122 @@
   </div>
 </div>
 -->
+  <!-- Modal selección de zona -->
+  <div id="zona-modal" class="zona-modal hidden" role="dialog" aria-modal="true" aria-label="Seleccioná tu zona">
+    <div class="zona-modal__content">
+      <img src="img/pclogo.png" alt="PellaClick" class="zona-modal__logo">
+      <h2 class="zona-modal__title">¿Desde dónde comprás?</h2>
+      <p class="zona-modal__subtitle">Elegí tu sucursal para ver los productos disponibles</p>
+
+      <div class="zona-modal__cards">
+        <button class="zona-card" data-zona="rio3">
+          <span class="zona-card__name">📍 Río Tercero</span>
+          <span class="zona-card__sub">Río Tercero · Río Cuarto · Villa María · Punilla</span>
+          <div class="zona-card__vendedores">
+            <div class="zona-card__vendedor">
+              <img src="img/vendedores/11.webp" alt="Dario" class="zona-card__foto">
+              <span class="zona-card__vnombre">Dario</span>
+            </div>
+            <div class="zona-card__vendedor">
+              <img src="img/vendedores/9.webp" alt="Emiliano" class="zona-card__foto">
+              <span class="zona-card__vnombre">Emiliano</span>
+            </div>
+            <div class="zona-card__vendedor">
+              <img src="img/vendedores/12.webp" alt="Pablo G." class="zona-card__foto">
+              <span class="zona-card__vnombre">Pablo G.</span>
+            </div>
+            <div class="zona-card__vendedor">
+              <img src="img/vendedores/7.webp" alt="Jhonatan" class="zona-card__foto">
+              <span class="zona-card__vnombre">Jhonatan</span>
+            </div>
+            <div class="zona-card__vendedor">
+              <img src="img/vendedores/10.webp" alt="Marcos" class="zona-card__foto">
+              <span class="zona-card__vnombre">Marcos</span>
+            </div>
+          </div>
+        </button>
+
+        <button class="zona-card" data-zona="sf">
+          <span class="zona-card__name">📍 San Francisco</span>
+          <span class="zona-card__sub">San Francisco · Rafaela</span>
+          <div class="zona-card__vendedores">
+            <div class="zona-card__vendedor">
+              <img src="img/vendedores/4.webp" alt="Mauro" class="zona-card__foto">
+              <span class="zona-card__vnombre">Mauro</span>
+            </div>
+            <div class="zona-card__vendedor">
+              <img src="img/vendedores/5.webp" alt="Pablo" class="zona-card__foto">
+              <span class="zona-card__vnombre">Pablo</span>
+            </div>
+            <div class="zona-card__vendedor">
+              <img src="img/vendedores/6.webp" alt="Franco" class="zona-card__foto">
+              <span class="zona-card__vnombre">Franco</span>
+            </div>
+          </div>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <div class="whatsapp-container">
     <div class="whatsapp-button" onclick="toggleWhatsappMenu()">
       <i class="fa-solid fa-info"></i>
     </div>
     <div class="whatsapp-menu" id="whatsapp-menu">
       <div class="whatsapp-title">PellaClick</div>
-      <a href="#" onclick="resetOnboarding(); return false;">
-        <i class="fa-solid fa-info"></i> Como usar
+      <a href="https://whatsapp.com/channel/0029Vb7idUpKWEKzM3QDqn1r" target="_blank" rel="noopener noreferrer">
+        <i class="fa-brands fa-whatsapp"></i> Canal de difusión
+      </a>
+      <a href="https://wa.me/5493516645382" target="_blank" rel="noopener noreferrer">
+        <i class="fa-solid fa-phone"></i> Adm. Río Tercero
+      </a>
+      <a href="https://wa.me/5493518751356" target="_blank" rel="noopener noreferrer">
+        <i class="fa-solid fa-phone"></i> Adm. San Francisco
       </a>
     </div>
   </div>
+    <script src="js/zona.js"></script>
+    <script src="js/index-preview.js" defer></script>
     <script src="js/app.js" defer></script>
     <script src="js/onboarding.js"></script>
+    <script>
+      (function () {
+        const modal = document.getElementById("zona-modal");
+        const chip = document.getElementById("zona-chip-btn");
+        const chipLabel = document.getElementById("zona-chip-label");
+
+        function actualizarChip() {
+          const zona = window.Zona.getLabel();
+          chipLabel.textContent = zona;
+          chip.classList.toggle("hidden", !zona);
+        }
+
+        window.abrirSelectorZona = function () {
+          modal.classList.remove("hidden");
+          modal.setAttribute("aria-hidden", "false");
+        };
+
+        function cerrarModal() {
+          modal.classList.add("hidden");
+          modal.setAttribute("aria-hidden", "true");
+        }
+
+        modal.querySelectorAll(".zona-card").forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            window.Zona.set(btn.dataset.zona);
+            cerrarModal();
+            actualizarChip();
+            window.loadIndexPreviews?.();
+          });
+        });
+
+        // Mostrar modal si no hay zona elegida
+        if (!window.Zona.get()) {
+          window.abrirSelectorZona();
+        }
+
+        actualizarChip();
+      })();
+    </script>
 </body>
 </html>

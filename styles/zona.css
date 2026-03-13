@@ -1,0 +1,188 @@
+/* ============================================================
+   ZONA MODAL — Selección de sucursal
+   ============================================================ */
+
+.zona-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  padding: 20px;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.zona-modal.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.zona-modal__content {
+  background: linear-gradient(160deg, #1f0808 0%, #2d1008 100%);
+  border-radius: 24px;
+  padding: 28px 20px 24px;
+  width: 100%;
+  max-width: 420px;
+  max-height: 90svh;
+  overflow-y: auto;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  animation: zonaSlideUp 0.35s ease;
+}
+
+@keyframes zonaSlideUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.zona-modal__logo {
+  width: 100px;
+  height: auto;
+  margin-bottom: 16px;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.2));
+}
+
+.zona-modal__title {
+  font-family: "Montserrat", sans-serif;
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #ff9060;
+  margin: 0 0 6px;
+  line-height: 1.2;
+}
+
+.zona-modal__subtitle {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.65);
+  margin: 0 0 24px;
+}
+
+
+/* Tarjetas de zona */
+.zona-modal__cards {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.zona-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 18px;
+  border: none;
+  border-radius: 18px;
+  cursor: pointer;
+  background: linear-gradient(135deg, #ff3131 0%, #ff914d 100%);
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(255, 60, 0, 0.35);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  width: 100%;
+}
+
+.zona-card:active {
+  transform: scale(0.97);
+  box-shadow: 0 3px 10px rgba(255, 60, 0, 0.3);
+}
+
+@media (hover: hover) {
+  .zona-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(255, 60, 0, 0.45);
+  }
+}
+
+.zona-card__name {
+  font-size: 1.1rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.zona-card__sub {
+  font-size: 0.75rem;
+  opacity: 0.88;
+  font-weight: 500;
+  margin-top: -6px;
+}
+
+/* Vendedores dentro de cada tarjeta */
+.zona-card__vendedores {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 4px;
+  pointer-events: none;
+}
+
+.zona-card__vendedor {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.zona-card__foto {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2.5px solid rgba(255, 255, 255, 0.7);
+  display: block;
+}
+
+.zona-card__vnombre {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.92);
+  text-align: center;
+}
+
+/* ============================================================
+   Chip de zona activa (visible en index.html)
+   ============================================================ */
+
+/* Chip de zona activa (visible en index.html) */
+.zona-chip.hidden {
+  display: none;
+}
+
+.zona-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 20px;
+  padding: 4px 12px;
+  margin-top: 12px;
+  cursor: pointer;
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+  transition: background 0.15s;
+}
+
+.zona-chip:hover {
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.zona-chip__dot {
+  width: 7px;
+  height: 7px;
+  background: #6dff6d;
+  border-radius: 50%;
+  flex-shrink: 0;
+}

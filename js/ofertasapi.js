@@ -20,7 +20,7 @@ let PRODUCTOS_MAP = {};
 async function fetchOfertas() {
   const url =
     `${SUPABASE_URL}/rest/v1/${TABLE}` +
-    `?select=CodigoProd,Descripcion,PrecioFinal,Proveedor,Categoria,Multiplos,ORDEN,Descuento,TiempoExclusivo,FechaInicio,FechaFinal` +
+    `?select=CodigoProd,Descripcion,PrecioFinal,Proveedor,Categoria,Multiplos,ORDEN,Descuento,TiempoExclusivo,FechaInicio,FechaFinal,ofertaPorCantidad,descPorCantidad` +
     `&order=Descuento.desc.nullslast,ORDEN.asc,Proveedor.asc`;
 
   const res = await fetch(url, {
@@ -60,14 +60,30 @@ function imgUrl(pathOrSku) {
   return `${STORAGE_BASE}${encodeURIComponent(finalPath)}?width=480&quality=80`;
 }
 
+// ========== BANNER CANAL DE DIFUSIÓN ==========
+let _bannerCount = 0; // contador global entre llamadas a renderProductCards
+const _bannerInterval = () => window.matchMedia('(min-width: 1024px)').matches ? 8 : 6;
+
+function createBannerEl() {
+  const el = document.createElement('a');
+  el.href = 'https://whatsapp.com/channel/0029Vb7idUpKWEKzM3QDqn1r';
+  el.target = '_blank';
+  el.rel = 'noopener noreferrer';
+  el.className = 'difusion-banner';
+  el.style.cssText = 'grid-column: 1 / -1; display: block;';
+  el.innerHTML = '<img src="img/canalDeDifBannerPella.png" alt="Canal de difusión" style="width:100%;display:block;border-radius:0 18px 0 18px;">';
+  return el;
+}
+
 // ========== RENDER PRODUCTOS (sin borrar grid) ==========
 function renderProductCards(container, items, insertAtStart = false) {
   if (!container) return;
   if (!Array.isArray(items)) items = [];
 
   const fragment = document.createDocumentFragment();
-
+  const interval = _bannerInterval();
   items.forEach((row) => {
+    const index = _bannerCount++;
     const sku = row.CodigoProd;
     const name = row.Descripcion;
     const base = Number(row.PrecioFinal || 0);
@@ -80,7 +96,9 @@ function renderProductCards(container, items, insertAtStart = false) {
 
     const isTiempoExclusivo = row.TiempoExclusivo === true || row.TiempoExclusivo === 'TRUE';
     const isDestacado = descNum > 0 || isTiempoExclusivo;
-    
+    const isOfertaPorCantidad = row.ofertaPorCantidad === true || row.ofertaPorCantidad === 'TRUE';
+    const descPorCantidad = Number(row.descPorCantidad || 0);
+
     let ribbon = "";
     if (isTiempoExclusivo) {
       // Ribbon con contador para TiempoExclusivo
@@ -98,9 +116,14 @@ function renderProductCards(container, items, insertAtStart = false) {
     const oldPrice =
       descNum > 0 ? `<div class="card-oldprice">$${money(base)}</div>` : "";
 
+    const ofertaCantidadBanner = isOfertaPorCantidad
+      ? `<div class="oferta-cantidad-banner${descNum > 0 ? ' has-ribbon' : ''}">OPORTUNIDAD hasta ${descPorCantidad}% EXTRA</div>`
+      : "";
+
     const card = document.createElement("article");
-    card.className = `card ${isDestacado ? "destacado" : ""} ${isTiempoExclusivo ? "tiempo-exclusivo" : ""}`;
+    card.className = `card ${isDestacado ? "destacado" : ""} ${isTiempoExclusivo ? "tiempo-exclusivo" : ""} ${isOfertaPorCantidad ? "oferta-cantidad" : ""}`;
     card.innerHTML = `
+      ${ofertaCantidadBanner}
       ${ribbon}
       <div class="card-img">
         <img src="${src}" alt="${name}" loading="lazy" decoding="async">
@@ -126,10 +149,15 @@ function renderProductCards(container, items, insertAtStart = false) {
       const multiple = Number(btn.dataset.multiple) || 1;
       const discount = Number(btn.dataset.discount) || 0;
 
-      window.Carrito?.add({ name, sku, price, multiple, discount });
+      window.Carrito?.add({ name, sku, price, multiple, discount, ofertaPorCantidad: isOfertaPorCantidad });
     });
 
     fragment.appendChild(card);
+
+    // Banner cada N productos (index acumulado global, 0-based)
+    if ((index + 1) % interval === 0) {
+      fragment.appendChild(createBannerEl());
+    }
   });
 
   // Si insertAtStart es true, insertar al principio
@@ -142,6 +170,7 @@ function renderProductCards(container, items, insertAtStart = false) {
 
 // ========== FILTROS ==========
 function applyFilters() {
+  _bannerCount = 0; // resetear contador de banners
   const grid = document.getElementById("catalogo");
   const q = (state.q || "").trim().toLowerCase();
 
@@ -171,8 +200,8 @@ function applyFilters() {
     const separator = grid.querySelector('.products-separator');
     if (separator) separator.style.display = 'none';
     
-    // Ocultar todos los productos
-    grid.querySelectorAll(".card:not(.combo-card)").forEach((card) => card.remove());
+    // Ocultar todos los productos y banners
+    grid.querySelectorAll(".card:not(.combo-card), .difusion-banner, .volver-todos-btn").forEach((el) => el.remove());
     
     return; // No renderizar productos
   }
@@ -204,12 +233,17 @@ function applyFilters() {
   // Filtrar productos exclusivos por fechas
   filteredProducts = filterActiveExclusiveProducts(filteredProducts);
 
-  // Ordenar: TiempoExclusivo primero, luego el resto
-  const exclusiveProducts = filteredProducts.filter(p => 
+  // Ordenar: TiempoExclusivo → ofertaPorCantidad → resto
+  const exclusiveProducts = filteredProducts.filter(p =>
     p.TiempoExclusivo === true || p.TiempoExclusivo === 'TRUE'
   );
-  const normalProducts = filteredProducts.filter(p => 
-    p.TiempoExclusivo !== true && p.TiempoExclusivo !== 'TRUE'
+  const ofertaCantidadProducts = filteredProducts.filter(p =>
+    (p.TiempoExclusivo !== true && p.TiempoExclusivo !== 'TRUE') &&
+    (p.ofertaPorCantidad === true || p.ofertaPorCantidad === 'TRUE')
+  );
+  const normalProducts = filteredProducts.filter(p =>
+    (p.TiempoExclusivo !== true && p.TiempoExclusivo !== 'TRUE') &&
+    (p.ofertaPorCantidad !== true && p.ofertaPorCantidad !== 'TRUE')
   );
 
   // Filtrar combos existentes (mostrar/ocultar)
@@ -246,10 +280,8 @@ function applyFilters() {
   const separator = grid.querySelector('.products-separator');
   if (separator) separator.style.display = '';
 
-  // Limpiar solo productos (no combos ni títulos)
-  grid
-    .querySelectorAll(".card:not(.combo-card)")
-    .forEach((card) => card.remove());
+  // Limpiar productos y banners (no combos ni títulos)
+  grid.querySelectorAll(".card:not(.combo-card), .difusion-banner, .volver-todos-btn").forEach((el) => el.remove());
 
   // Renderizar en orden:
   // 1. Productos con TiempoExclusivo (al principio, antes de combos)
@@ -264,10 +296,32 @@ function applyFilters() {
   }
   
   // 2. Combos ya están en el DOM, solo ajustamos visibilidad (ya manejado arriba)
-  
-  // 3. Productos normales (al final)
+
+  // 3. Productos con oferta por cantidad
+  if (ofertaCantidadProducts.length > 0) {
+    renderProductCards(grid, ofertaCantidadProducts, false);
+  }
+
+  // 4. Productos normales (al final)
   if (normalProducts.length > 0) {
     renderProductCards(grid, normalProducts, false);
+  }
+
+  // Si el total de productos fue menor al intervalo, no se insertó ningún banner → agregar uno
+  if (_bannerCount > 0 && _bannerCount < _bannerInterval()) {
+    grid.appendChild(createBannerEl());
+  }
+
+  // Botón "volver a todos" si hay filtro activo
+  if (state.cat !== "todas") {
+    const btn = document.createElement("button");
+    btn.className = "volver-todos-btn";
+    btn.textContent = "Volver a todos";
+    btn.addEventListener("click", () => {
+      const chip = document.querySelector('.category-chip[data-category="todas"]');
+      if (chip) chip.click();
+    });
+    grid.appendChild(btn);
   }
 }
 
@@ -357,12 +411,21 @@ document.addEventListener("DOMContentLoaded", async () => {
     setupSearch();
     setupFiltersToggle();
 
-    const [productos, combos] = await Promise.all([
+    const [productos, combos, stockSet] = await Promise.all([
       fetchOfertas(),
       fetchCombos(),
+      window.Zona ? window.Zona.fetchStockSet() : Promise.resolve(null),
     ]);
 
-    ALL = productos;
+    if (stockSet) {
+      console.log(`[Oferta] Total productos BD: ${productos.length} | Zona stockSet size: ${stockSet.size}`);
+      console.log(`[Oferta] Muestra CodigoProd (primeros 5):`, productos.slice(0, 5).map(p => p.CodigoProd));
+      ALL = productos.filter((p) => stockSet.has(String(p.CodigoProd)));
+      console.log(`[Oferta] Productos después del filtro: ${ALL.length}`);
+    } else {
+      console.log(`[Oferta] stockSet es null → mostrando todos (${productos.length})`);
+      ALL = productos;
+    }
     ALL_COMBOS = combos;
 
     productos.forEach((p) => {

@@ -47,7 +47,7 @@
   align-items: center;
   gap: 10px;
   color: #fff;
-  font: 600 14px/1 "League Spartan", system-ui, sans-serif;
+  font: 600 14px/1 "Montserrat", sans-serif;
 }
 .ob-18 input {
   width: 18px;
@@ -61,7 +61,7 @@
   border: 0;
   border-radius: 14px;
   padding: clamp(12px, 3.5vw, 16px);
-  font-family: "League Spartan", system-ui, sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-weight: bold;
   font-size: 22px;
   color: #ff3131;
@@ -122,7 +122,7 @@
   color: #fff;
   padding: 18px 24px;
   border-radius: 14px;
-  font: 700 16px/1.4 "League Spartan", system-ui, sans-serif;
+  font: 700 16px/1.4 "Montserrat", sans-serif;
   text-align: center;
   box-shadow: 0 8px 24px rgba(0,0,0,0.35);
   opacity: 0;

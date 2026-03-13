@@ -53,41 +53,61 @@ function ensureCatalogContainer() {
   return grid;
 }
 
+// ======= Banner canal de difusión =======
+function createBannerEl() {
+  const el = document.createElement('a');
+  el.href = 'https://whatsapp.com/channel/0029Vb7idUpKWEKzM3QDqn1r';
+  el.target = '_blank';
+  el.rel = 'noopener noreferrer';
+  el.style.cssText = 'grid-column: 1 / -1; display: block;';
+  el.innerHTML = '<img src="img/canalDeDifBannerPella.png" alt="Canal de difusión" style="width:100%;display:block;border-radius:0 18px 0 18px;">';
+  return el;
+}
+
 // ======= Render cards =======
 function renderCigarCards(container, items) {
   if (!container) return;
   if (!Array.isArray(items)) items = [];
 
-  container.innerHTML = items.map(row => {
+  container.innerHTML = '';
+  const interval = window.matchMedia('(min-width: 1024px)').matches ? 8 : 6;
+
+  items.forEach((row, index) => {
     const sku   = row.PRODUCTO;
     const name  = row.DESCRIPCION;
     const price = Number(row.PRECIO || 0);
     const src   = imgUrl(row.IMG_PATH || sku);
     const dest  = !!row.DESTACADO;
 
-    return `
-      <article class="card ${dest ? "destacado" : ""}">
-        <div class="card-img">
-          <img src="${src}" alt="${name}" loading="lazy" decoding="async">
-        </div>
-        <h3 class="card-title">${name}</h3>
-        <div class="card-price"><span>$${money(price)}</span></div>
-        <button class="card-add"
-                type="button"
-                data-sku="${sku}"
-                data-name="${name}"
-                data-price="${price}">
-          Agregar
-        </button>
-      </article>
+    const card = document.createElement('article');
+    card.className = `card ${dest ? 'destacado' : ''}`;
+    card.innerHTML = `
+      <div class="card-img">
+        <img src="${src}" alt="${name}" loading="lazy" decoding="async">
+      </div>
+      <h3 class="card-title">${name}</h3>
+      <div class="card-price"><span>$${money(price)}</span></div>
+      <button class="card-add"
+              type="button"
+              data-sku="${sku}"
+              data-name="${name}"
+              data-price="${price}">
+        Agregar
+      </button>
     `;
-  }).join("");
+    container.appendChild(card);
 
-  container.querySelectorAll(".card-add").forEach(btn => {
-    btn.addEventListener("click", () => {
-    const { sku, name } = btn.dataset;
-    const price = Number(btn.dataset.price || 0);
-    window.Carrito?.add({ name, sku, price, qty: 1 });  // ✅ sigue siendo válido
+    // Banner cada N productos
+    if ((index + 1) % interval === 0 && index < items.length - 1) {
+      container.appendChild(createBannerEl());
+    }
+  });
+
+  container.querySelectorAll('.card-add').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const { sku, name } = btn.dataset;
+      const price = Number(btn.dataset.price || 0);
+      window.Carrito?.add({ name, sku, price, qty: 1 });
     });
   });
 }
@@ -174,9 +194,15 @@ document.addEventListener("DOMContentLoaded", async () => {
   const grid = ensureCatalogContainer();
   setupToolbar();        // si lo tenés
   try {
-    ALL = await fetchCigarrillos();
-    buildCategories(ALL); // si lo tenés
-    applyFilters();       // o renderCigarCards(...)
+    const [cigarrillos, stockSet] = await Promise.all([
+      fetchCigarrillos(),
+      window.Zona ? window.Zona.fetchStockSet() : Promise.resolve(null),
+    ]);
+    ALL = stockSet
+      ? cigarrillos.filter((c) => stockSet.has(String(c.PRODUCTO)))
+      : cigarrillos;
+    buildCategories(ALL);
+    applyFilters();
   } catch (e) {
     console.error(e);
   }

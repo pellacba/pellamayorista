@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="shortcut icon" href="img/pellalogo.png" type="image/x-icon">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles/cart-page.css">
   <link rel="stylesheet" href="styles/onboarding.css">
   <title>Tu Carrito - PellaClick</title>
@@ -101,6 +101,23 @@
 
     </div>
   </main>
+
+  <!-- Modal Oportunidad por Cantidad -->
+  <div id="oportunidad-backdrop" class="oportunidad-backdrop"></div>
+  <div id="oportunidad-modal" class="oportunidad-modal" role="dialog" aria-modal="true">
+    <div class="oportunidad-card">
+      <div class="oportunidad-header">
+        <span class="oportunidad-icon">🏷️</span>
+        <h3>¡Tenés productos con oportunidades!</h3>
+        <p>¿Querés que tu vendedor te informe sobre ellas?</p>
+      </div>
+      <ul id="oportunidad-list" class="oportunidad-list"></ul>
+      <div class="oportunidad-actions">
+        <button id="oportunidad-skip" class="oportunidad-btn-skip">Omitir</button>
+        <button id="oportunidad-confirm" class="oportunidad-btn-confirm">Continuar →</button>
+      </div>
+    </div>
+  </div>
 
   <!-- Modal Seleccionar Vendedor -->
   <div id="seller-backdrop" class="seller-backdrop" aria-hidden="true"></div>
