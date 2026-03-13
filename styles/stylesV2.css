@@ -468,20 +468,12 @@ body.ofertas-page{
   border: 4px solid #f5c800;
   box-shadow: 0 0 16px rgba(245, 200, 0, 0.5),
               0 8px 24px rgba(0, 0, 0, 0.25);
-  animation: glow-cantidad 2s ease-in-out infinite alternate;
-}
-
-@keyframes glow-cantidad {
-  from { box-shadow: 0 0 10px rgba(245, 200, 0, 0.4), 0 8px 20px rgba(0,0,0,.2); }
-  to   { box-shadow: 0 0 24px rgba(245, 200, 0, 0.75), 0 10px 28px rgba(0,0,0,.28); }
 }
 
 .oferta-cantidad-banner {
   position: relative;
   overflow: hidden;
-  background: linear-gradient(90deg, #f5c800 0%, #ffe566 50%, #f5c800 100%);
-  background-size: 200% 100%;
-  animation: shimmer-cantidad 2.8s linear infinite;
+  background: #f5c800;
   color: #111;
   font-size: 12px;
   font-weight: 800;
@@ -504,10 +496,6 @@ body.ofertas-page{
   flex-shrink: 0;
 }
 
-@keyframes shimmer-cantidad {
-  0%   { background-position: 200% center; }
-  100% { background-position: -200% center; }
-}
 
 @media (max-width: 480px) {
   .oferta-cantidad-banner {
