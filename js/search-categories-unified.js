@@ -75,7 +75,6 @@ function buildCategoriesScroll(categories) {
       // Actualizar estado global
       if (window.state) {
         window.state.cat = selectedCategory;
-        console.log('Categoría seleccionada:', selectedCategory); // Debug
       }
       
       // Llamar función de filtrado

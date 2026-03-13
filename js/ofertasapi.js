@@ -16,6 +16,54 @@ let ALL = [];
 let ALL_COMBOS = [];
 let PRODUCTOS_MAP = {};
 
+// ========== PAGINACIÓN ==========
+const PAGE_SIZE = 20;
+let _currentPage = 1;
+let _paginatedItems = []; // ofertaCantidad + normal filtrados
+
+function _renderPage() {
+  const grid = document.getElementById("catalogo");
+  const from = (_currentPage - 1) * PAGE_SIZE;
+  const to = _currentPage * PAGE_SIZE;
+  const slice = _paginatedItems.slice(from, to);
+  if (slice.length > 0) renderProductCards(grid, slice, false);
+
+  // Si es la última página y se renderizaron pocos productos, agregar banner
+  const isLastPage = to >= _paginatedItems.length;
+  if (isLastPage && _bannerCount > 0 && _bannerCount < _bannerInterval()) {
+    grid?.appendChild(createBannerEl());
+  }
+}
+
+function _updatePaginationUI() {
+  const shown = _currentPage * PAGE_SIZE;
+  const total = _paginatedItems.length;
+  const remaining = Math.max(0, total - shown);
+
+  const loadMoreBtn = document.getElementById("load-more-btn");
+  const volverBtn = document.getElementById("volver-todos-btn");
+
+  if (loadMoreBtn) {
+    if (remaining > 0) {
+      loadMoreBtn.style.display = "";
+      loadMoreBtn.textContent = `Cargar más productos (${remaining} restantes)`;
+    } else {
+      loadMoreBtn.style.display = "none";
+    }
+  }
+
+  if (volverBtn) {
+    volverBtn.style.display = state.cat !== "todas" ? "" : "none";
+  }
+}
+
+function loadMoreProducts() {
+  _currentPage++;
+  _renderPage();
+  _updatePaginationUI();
+}
+window.loadMoreProducts = loadMoreProducts;
+
 // ========== FETCH ==========
 async function fetchOfertas() {
   const url =
@@ -170,50 +218,40 @@ function renderProductCards(container, items, insertAtStart = false) {
 
 // ========== FILTROS ==========
 function applyFilters() {
-  _bannerCount = 0; // resetear contador de banners
+  _bannerCount = 0;
+  _currentPage = 1;
+  _paginatedItems = [];
+
   const grid = document.getElementById("catalogo");
   const q = (state.q || "").trim().toLowerCase();
 
   // Si la categoría es "Combos", mostrar solo combos
   if (state.cat === "Combos" || state.cat === "combos") {
-    // Mostrar todos los combos
     const allCombos = grid.querySelectorAll('.combo-card');
     allCombos.forEach(comboCard => {
       const comboName = comboCard.querySelector('.combo-title')?.textContent?.toLowerCase() || '';
-      
-      // Aplicar filtro de búsqueda si existe
-      if (q && !comboName.includes(q)) {
-        comboCard.style.display = 'none';
-      } else {
-        comboCard.style.display = '';
-      }
+      comboCard.style.display = (q && !comboName.includes(q)) ? 'none' : '';
     });
-    
-    // Mostrar título de combos
+
     const comboTitle = grid.querySelector('.combo-section-title');
     if (comboTitle) {
       const visibleCombos = Array.from(allCombos).filter(c => c.style.display !== 'none');
       comboTitle.style.display = visibleCombos.length > 0 ? '' : 'none';
     }
-    
-    // Ocultar separador de productos
+
     const separator = grid.querySelector('.products-separator');
     if (separator) separator.style.display = 'none';
-    
-    // Ocultar todos los productos y banners
-    grid.querySelectorAll(".card:not(.combo-card), .difusion-banner, .volver-todos-btn").forEach((el) => el.remove());
-    
-    return; // No renderizar productos
+
+    grid.querySelectorAll(".card:not(.combo-card), .difusion-banner").forEach((el) => el.remove());
+    _updatePaginationUI();
+    return;
   }
 
   // Filtrar productos
   let filteredProducts = [...ALL];
 
-  // Si la categoría es "Descuentos Exclusivos", filtrar solo productos con descuento
   if (state.cat === "Descuentos Exclusivos" || state.cat === "descuentos exclusivos") {
-    filteredProducts = filteredProducts.filter(
-      (r) => r.Descuento && r.Descuento > 0
-    );
+    filteredProducts = filteredProducts.filter((r) => r.Descuento && r.Descuento > 0);
   } else if (state.cat !== "todas") {
     filteredProducts = filteredProducts.filter(
       (r) => (r.Categoria || "").toLowerCase() === state.cat.toLowerCase(),
@@ -224,16 +262,13 @@ function applyFilters() {
     filteredProducts = filteredProducts.filter(
       (r) =>
         (r.Descripcion || "").toLowerCase().includes(q) ||
-        String(r.CodigoProd || "")
-          .toLowerCase()
-          .includes(q),
+        String(r.CodigoProd || "").toLowerCase().includes(q),
     );
   }
 
-  // Filtrar productos exclusivos por fechas
   filteredProducts = filterActiveExclusiveProducts(filteredProducts);
 
-  // Ordenar: TiempoExclusivo → ofertaPorCantidad → resto
+  // Separar por prioridad
   const exclusiveProducts = filteredProducts.filter(p =>
     p.TiempoExclusivo === true || p.TiempoExclusivo === 'TRUE'
   );
@@ -246,83 +281,41 @@ function applyFilters() {
     (p.ofertaPorCantidad !== true && p.ofertaPorCantidad !== 'TRUE')
   );
 
-  // Filtrar combos existentes (mostrar/ocultar)
+  // Visibilidad de combos
   const allCombos = grid.querySelectorAll('.combo-card');
   allCombos.forEach(comboCard => {
     const comboName = comboCard.querySelector('.combo-title')?.textContent?.toLowerCase() || '';
-    
-    // Si hay búsqueda, filtrar por nombre del combo
     if (q) {
-      if (comboName.includes(q)) {
-        comboCard.style.display = '';
-      } else {
-        comboCard.style.display = 'none';
-      }
-    }
-    // Si hay filtro de categoría (que no sea "todas"), ocultar combos
-    else if (state.cat !== "todas") {
+      comboCard.style.display = comboName.includes(q) ? '' : 'none';
+    } else if (state.cat !== "todas") {
       comboCard.style.display = 'none';
-    }
-    // Sin filtros, mostrar todos los combos
-    else {
+    } else {
       comboCard.style.display = '';
     }
   });
 
-  // También mostrar/ocultar el título de combos
   const comboTitle = grid.querySelector('.combo-section-title');
   if (comboTitle) {
     const visibleCombos = Array.from(allCombos).filter(c => c.style.display !== 'none');
     comboTitle.style.display = visibleCombos.length > 0 ? '' : 'none';
   }
-  
-  // Mostrar separador de productos
+
   const separator = grid.querySelector('.products-separator');
   if (separator) separator.style.display = '';
 
-  // Limpiar productos y banners (no combos ni títulos)
-  grid.querySelectorAll(".card:not(.combo-card), .difusion-banner, .volver-todos-btn").forEach((el) => el.remove());
+  // Limpiar solo product cards y banners (no combos ni títulos)
+  grid.querySelectorAll(".card:not(.combo-card), .difusion-banner").forEach((el) => el.remove());
 
-  // Renderizar en orden:
-  // 1. Productos con TiempoExclusivo (al principio, antes de combos)
+  // 1. Exclusivos siempre se renderizan completos (son pocos)
   if (exclusiveProducts.length > 0) {
-    renderProductCards(grid, exclusiveProducts, true); // insertAtStart = true
-    
-    // Iniciar timers inmediatamente después de renderizar
-    setTimeout(() => {
-      const timers = document.querySelectorAll('.timer-countdown');
-      startExclusiveTimers(exclusiveProducts); // Pasar productos como parámetro
-    }, 300);
-  }
-  
-  // 2. Combos ya están en el DOM, solo ajustamos visibilidad (ya manejado arriba)
-
-  // 3. Productos con oferta por cantidad
-  if (ofertaCantidadProducts.length > 0) {
-    renderProductCards(grid, ofertaCantidadProducts, false);
+    renderProductCards(grid, exclusiveProducts, true);
+    setTimeout(() => startExclusiveTimers(exclusiveProducts), 300);
   }
 
-  // 4. Productos normales (al final)
-  if (normalProducts.length > 0) {
-    renderProductCards(grid, normalProducts, false);
-  }
-
-  // Si el total de productos fue menor al intervalo, no se insertó ningún banner → agregar uno
-  if (_bannerCount > 0 && _bannerCount < _bannerInterval()) {
-    grid.appendChild(createBannerEl());
-  }
-
-  // Botón "volver a todos" si hay filtro activo
-  if (state.cat !== "todas") {
-    const btn = document.createElement("button");
-    btn.className = "volver-todos-btn";
-    btn.textContent = "Volver a todos";
-    btn.addEventListener("click", () => {
-      const chip = document.querySelector('.category-chip[data-category="todas"]');
-      if (chip) chip.click();
-    });
-    grid.appendChild(btn);
-  }
+  // 2. Resto se pagina
+  _paginatedItems = [...ofertaCantidadProducts, ...normalProducts];
+  _renderPage();
+  _updatePaginationUI();
 }
 
 // Exponer globalmente para que search-categories-unified.js pueda llamarla
@@ -418,12 +411,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     ]);
 
     if (stockSet) {
-      console.log(`[Oferta] Total productos BD: ${productos.length} | Zona stockSet size: ${stockSet.size}`);
-      console.log(`[Oferta] Muestra CodigoProd (primeros 5):`, productos.slice(0, 5).map(p => p.CodigoProd));
       ALL = productos.filter((p) => stockSet.has(String(p.CodigoProd)));
-      console.log(`[Oferta] Productos después del filtro: ${ALL.length}`);
     } else {
-      console.log(`[Oferta] stockSet es null → mostrando todos (${productos.length})`);
       ALL = productos;
     }
     ALL_COMBOS = combos;
@@ -902,6 +891,19 @@ document.addEventListener("DOMContentLoaded", () => {
   document
     .getElementById("combo-confirm-btn")
     ?.addEventListener("click", confirmComboSelection);
+
+  // Paginación
+  document
+    .getElementById("load-more-btn")
+    ?.addEventListener("click", loadMoreProducts);
+
+  // Volver a todos
+  document
+    .getElementById("volver-todos-btn")
+    ?.addEventListener("click", () => {
+      const chip = document.querySelector('.category-chip[data-category="todas"]');
+      if (chip) chip.click();
+    });
 });
 
 // ========== CONTADOR DE TIEMPO EXCLUSIVO ==========
