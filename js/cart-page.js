@@ -468,15 +468,12 @@ function sendOrderToSeller(sellerId) {
   const url = `https://wa.me/${seller.phone}?text=${encodeURIComponent(msg)}`;
   window.open(url, "_blank");
 
-  // Preguntar si quiere vaciar el carrito
-  setTimeout(async () => {
-    const confirmed = await showConfirm("¿Pedido enviado? ¿Deseas vaciar el carrito?");
-    if (confirmed) {
-      cart.items = [];
-      saveCart();
-      render();
-      showNotification("Carrito vaciado", "$0,00", 2000);
-    }
+  // Vaciar carrito automáticamente al enviar el pedido
+  setTimeout(() => {
+    cart.items = [];
+    saveCart();
+    render();
+    showNotification("Carrito vaciado", "$0,00", 2000);
   }, 1000);
 
   closeSellerModal();
