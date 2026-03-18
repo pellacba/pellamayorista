@@ -230,6 +230,15 @@ function renderCartItems() {
   bindCartItemEvents();
 }
 
+// ===== Actualizar qty de un item en el DOM sin re-renderizar imágenes =====
+function updateItemQtyInDOM(index) {
+  const item = cart.items[index];
+  const row = document.querySelector(`.cart-item[data-index="${index}"]`);
+  if (!row) return;
+  row.querySelector('.qty-input').value = item.qty;
+  row.querySelector('.item-total').textContent = `$${money(item.price * item.qty)}`;
+}
+
 // ===== Eventos de items del carrito =====
 function bindCartItemEvents() {
   // Incrementar cantidad
@@ -240,10 +249,11 @@ function bindCartItemEvents() {
       const multiple = item.multiple || 1;
       item.qty += multiple;
       saveCart();
-      render();
+      updateItemQtyInDOM(index);
+      renderSummary();
     });
   });
-  
+
   // Decrementar cantidad
   document.querySelectorAll('.qty-dec').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -253,11 +263,12 @@ function bindCartItemEvents() {
       if (item.qty > multiple) {
         item.qty -= multiple;
         saveCart();
-        render();
+        updateItemQtyInDOM(index);
+        renderSummary();
       }
     });
   });
-  
+
   // Input manual
   document.querySelectorAll('.qty-input').forEach(input => {
     input.addEventListener('change', (e) => {
@@ -265,16 +276,17 @@ function bindCartItemEvents() {
       const item = cart.items[index];
       const multiple = item.multiple || 1;
       let newQty = parseInt(e.target.value) || multiple;
-      
+
       // Redondear al múltiplo más cercano
       newQty = Math.max(multiple, Math.ceil(newQty / multiple) * multiple);
       item.qty = newQty;
       saveCart();
-      render();
+      updateItemQtyInDOM(index);
+      renderSummary();
     });
   });
-  
-  // Eliminar item
+
+  // Eliminar item — acá sí hay que re-renderizar todo (cambian los índices)
   document.querySelectorAll('.item-remove').forEach(btn => {
     btn.addEventListener('click', async () => {
       const index = parseInt(btn.dataset.index);
