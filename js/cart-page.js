@@ -417,7 +417,7 @@ const SELLERS = [
   { id: "v8", name: "Dario",      phone: "5493516645322", photo: "img/vendedores/11.webp", zona: "Rio Tercero",   deposito: ["rio3"] },
   { id: "v6", name: "Franco",     phone: "5493518025934", photo: "img/vendedores/6.webp",  zona: "Rafaela",       deposito: ["sf"] },
   { id: "v7", name: "Emiliano",   phone: "5493516645419", photo: "img/vendedores/9.webp",  zona: "Rio Cuarto",    deposito: ["rio3"] },
-  { id: "v3", name: "Pablo Gomez",phone: "5493516645373", photo: "img/vendedores/12.webp", zona: "Rio Cuarto",    deposito: ["rio3"] }
+  { id: "v3", name: "Cristian Gomez",phone: "5493516645373", photo: "img/vendedores/12.jpeg", zona: "Rio Cuarto",    deposito: ["rio3"] }
 ];
 
 function openSellerModal() {
