@@ -165,7 +165,7 @@ function renderProductCards(container, items, insertAtStart = false) {
       descNum > 0 ? `<div class="card-oldprice">$${money(base)}</div>` : "";
 
     const ofertaCantidadBanner = isOfertaPorCantidad
-      ? `<div class="oferta-cantidad-banner${descNum > 0 ? ' has-ribbon' : ''}">${descPorCantidad > 0 ? `OPORTUNIDAD hasta ${descPorCantidad}% EXTRA` : '¡oportunidad extra por cantidad!'}</div>`
+      ? `<div class="oferta-cantidad-banner${descNum > 0 ? ' has-ribbon' : ''}">${descPorCantidad > 0 ? `OPORTUNIDAD hasta ${descPorCantidad}% EXTRA` : '¡Oportunidad extra en este producto!'}</div>`
       : "";
 
     const card = document.createElement("article");
